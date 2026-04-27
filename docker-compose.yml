@@ -1,5 +1,6 @@
 services:
   payload:
+    container_name: payload
     build:
       context: .
       dockerfile: Dockerfile
