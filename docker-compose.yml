@@ -1,43 +1,23 @@
-version: '3'
-
 services:
   payload:
-    image: node:20-alpine
-    ports:
-      - '3000:3000'
-    volumes:
-      - .:/home/node/app
-      - node_modules:/home/node/app/node_modules
-    working_dir: /home/node/app/
-    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
-    depends_on:
-      - mongo
-      # - postgres
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
     env_file:
       - .env
-
-  # Ensure your DATABASE_URL uses 'mongo' as the hostname ie. mongodb://mongo/my-db-name
-  mongo:
-    image: mongo:latest
-    ports:
-      - '27017:27017'
-    command:
-      - --storageEngine=wiredTiger
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    networks:
+      - web-network
     volumes:
-      - data:/data/db
-    logging:
-      driver: none
+      - payload_media:/app/media
 
-  # Uncomment the following to use postgres
-  # postgres:
-  #   restart: always
-  #   image: postgres:latest
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
+networks:
+  web-network:
+    external: true
 
 volumes:
-  data:
-  # pgdata:
-  node_modules:
+  payload_media:
