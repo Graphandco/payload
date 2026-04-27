@@ -1,4 +1,12 @@
 import type { Access, CollectionConfig } from 'payload'
+import {
+  ConditionalRepeaterBlock,
+  FormattedTextBlock,
+  GalleryBlock,
+  ImageBlock,
+  SimpleParagraphBlock,
+  SimpleTextBlock,
+} from '../blocks'
 
 const SUPER_ADMIN_EMAIL = 'contact@graphandco.com'
 
@@ -19,7 +27,7 @@ const getDefaultUserSiteID = (user: any): number | string | null => {
   return siteIDs.length > 0 ? siteIDs[0] : null
 }
 
-const canReadMedia: Access = ({ req }) => {
+const canReadPages: Access = ({ req }) => {
   if (!req.user) {
     return false
   }
@@ -40,7 +48,7 @@ const canReadMedia: Access = ({ req }) => {
   }
 }
 
-const canManageMedia: Access = ({ req }) => {
+const canManagePages: Access = ({ req }) => {
   if (!req.user) {
     return false
   }
@@ -61,13 +69,16 @@ const canManageMedia: Access = ({ req }) => {
   }
 }
 
-export const Media: CollectionConfig = {
-  slug: 'media',
+export const Pages: CollectionConfig = {
+  slug: 'pages',
+  admin: {
+    useAsTitle: 'title',
+  },
   access: {
-    read: canReadMedia,
+    read: canReadPages,
     create: ({ req }) => Boolean(req.user),
-    update: canManageMedia,
-    delete: canManageMedia,
+    update: canManagePages,
+    delete: canManagePages,
   },
   fields: [
     {
@@ -99,11 +110,54 @@ export const Media: CollectionConfig = {
       },
     },
     {
-      name: 'alt',
+      name: 'title',
       type: 'text',
+      required: true,
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+    },
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Contenu',
+          fields: [
+            {
+              name: 'layout',
+              type: 'blocks',
+              required: true,
+              blocks: [
+                SimpleTextBlock,
+                SimpleParagraphBlock,
+                FormattedTextBlock,
+                ImageBlock,
+                ConditionalRepeaterBlock,
+                GalleryBlock,
+              ],
+            },
+          ],
+        },
+        {
+          label: 'SEO',
+          fields: [
+            {
+              name: 'seoMetaTitle',
+              label: 'SEO Meta Title',
+              type: 'textarea',
+            },
+            {
+              name: 'seoMetaDescription',
+              label: 'SEO Meta Description',
+              type: 'textarea',
+            },
+          ],
+        },
+      ],
     },
   ],
-  upload: true,
   hooks: {
     beforeChange: [
       ({ req, data }) => {

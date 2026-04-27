@@ -4,9 +4,12 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { fr } from '@payloadcms/translations/languages/fr'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Sites } from './collections/Sites'
+import { Pages } from './collections/Pages'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -14,11 +17,34 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
+    suppressHydrationWarning: true,
+    meta: {
+      titleSuffix: ' - Graph & Co CMS',
+      description: 'Interface CMS Graph & Co.',
+    },
+    dateFormat: 'd MMMM yyyy à HH:mm',
+    timezones: {
+      supportedTimezones: [
+        {
+          label: 'Europe/Paris',
+          value: 'Europe/Paris',
+        },
+        {
+          label: 'UTC',
+          value: 'UTC',
+        },
+      ],
+      defaultTimezone: 'Europe/Paris',
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Sites, Users, Pages, Media],
+  i18n: {
+    fallbackLanguage: 'fr',
+    supportedLanguages: { fr },
+  },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
