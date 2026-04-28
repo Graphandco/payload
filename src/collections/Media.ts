@@ -28,9 +28,6 @@ export const Media: CollectionConfig = {
       type: 'relationship',
       relationTo: 'sites',
       required: true,
-      access: {
-        read: ({ req }) => isSuperAdmin(req.user),
-      },
       admin: {
         condition: (_, __, { user }) => isSuperAdmin(user),
       },

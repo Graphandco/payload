@@ -8,6 +8,7 @@ import {
   getUserSiteIDs,
   isSuperAdmin,
 } from '../lib/siteAccess'
+import { createSlugFromField } from '../lib/slug'
 
 const baseReadProducts = createSiteScopedReadAccess()
 const canReadProducts = createHideWhenEmptyReadAccess(baseReadProducts, 'products')
@@ -35,9 +36,6 @@ export const Products: CollectionConfig = {
       type: 'relationship',
       relationTo: 'sites',
       required: true,
-      access: {
-        read: ({ req }) => isSuperAdmin(req.user),
-      },
       admin: {
         condition: (_, __, { user }) => isSuperAdmin(user),
       },
@@ -95,20 +93,24 @@ export const Products: CollectionConfig = {
       },
     },
     {
-      name: 'shortDescription',
-      label: 'Description courte',
-      type: 'textarea',
-    },
-    {
-      name: 'description',
-      label: 'Description',
-      type: 'textarea',
-    },
-    {
-      name: 'price',
-      label: 'Prix',
+      name: 'quantity',
+      label: 'Quantité',
       type: 'number',
-      min: 0,
+      defaultValue: 1,
+      required: true,
+      min: 1,
+    },
+    {
+      name: 'is_to_buy',
+      label: 'À acheter',
+      type: 'checkbox',
+      defaultValue: false,
+    },
+    {
+      name: 'is_in_cart',
+      label: 'Dans le panier',
+      type: 'checkbox',
+      defaultValue: false,
     },
     {
       name: 'featuredImage',
@@ -118,6 +120,7 @@ export const Products: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeValidate: [createSlugFromField('name')],
     beforeChange: [
       ({ req, data }) => {
         if (isSuperAdmin(req.user)) {

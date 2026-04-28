@@ -8,6 +8,7 @@ import {
   getUserSiteIDs,
   isSuperAdmin,
 } from '../lib/siteAccess'
+import { createSlugFromField } from '../lib/slug'
 
 const baseReadCategories = createSiteScopedReadAccess()
 const canReadCategories = createHideWhenEmptyReadAccess(baseReadCategories, 'categories')
@@ -35,9 +36,6 @@ export const Categories: CollectionConfig = {
       type: 'relationship',
       relationTo: 'sites',
       required: true,
-      access: {
-        read: ({ req }) => isSuperAdmin(req.user),
-      },
       admin: {
         condition: (_, __, { user }) => isSuperAdmin(user),
       },
@@ -75,6 +73,7 @@ export const Categories: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeValidate: [createSlugFromField('name')],
     beforeChange: [
       ({ req, data }) => {
         if (isSuperAdmin(req.user)) {

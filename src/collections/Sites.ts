@@ -1,4 +1,5 @@
 import type { Access, CollectionConfig } from 'payload'
+import { createSlugFromField } from '../lib/slug'
 
 const isAdmin: Access = ({ req }) => {
   return req.user?.role === 'admin'
@@ -27,4 +28,7 @@ export const Sites: CollectionConfig = {
       required: true,
     },
   ],
+  hooks: {
+    beforeValidate: [createSlugFromField('name')],
+  },
 }

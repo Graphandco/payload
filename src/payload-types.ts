@@ -236,9 +236,9 @@ export interface Product {
    * Catégories réutilisables (produits, blog, etc.).
    */
   categories?: (number | Category)[] | null;
-  shortDescription?: string | null;
-  description?: string | null;
-  price?: number | null;
+  quantity: number;
+  is_to_buy?: boolean | null;
+  is_in_cart?: boolean | null;
   featuredImage?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
@@ -473,9 +473,9 @@ export interface ProductsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   categories?: T;
-  shortDescription?: T;
-  description?: T;
-  price?: T;
+  quantity?: T;
+  is_to_buy?: T;
+  is_in_cart?: T;
   featuredImage?: T;
   updatedAt?: T;
   createdAt?: T;
