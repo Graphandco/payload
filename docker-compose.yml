@@ -14,11 +14,8 @@ services:
     networks:
       - web-network
     volumes:
-      - payload_media:/app/media
+      - ./media:/app/media
 
 networks:
   web-network:
     external: true
-
-volumes:
-  payload_media:
