@@ -58,6 +58,7 @@ export const Products: CollectionConfig = {
     },
     {
       name: 'name',
+      label: 'Nom',
       type: 'text',
       required: true,
     },

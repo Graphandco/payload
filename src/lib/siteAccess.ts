@@ -3,6 +3,7 @@ import type { Access } from 'payload'
 const SUPER_ADMIN_EMAIL = 'contact@graphandco.com'
 
 export const isSuperAdmin = (user: any): boolean => user?.email === SUPER_ADMIN_EMAIL
+export const isAdminUser = (user: any): boolean => user?.role === 'admin'
 
 export const getUserSiteIDs = (user: any): (number | string)[] => {
   if (!Array.isArray(user?.sites)) {
@@ -49,7 +50,7 @@ export const createSiteScopedReadAccess = (siteField = 'site'): Access => {
       return false
     }
 
-    if (isSuperAdmin(req.user)) {
+    if (isSuperAdmin(req.user) || isAdminUser(req.user)) {
       return true
     }
 
@@ -68,7 +69,7 @@ export const createSiteScopedManageAccess = (siteField = 'site'): Access => {
       return false
     }
 
-    if (isSuperAdmin(req.user)) {
+    if (isSuperAdmin(req.user) || isAdminUser(req.user)) {
       return true
     }
 
@@ -105,7 +106,7 @@ export const createHideWhenEmptyCreateAccess = (collection: string, siteField = 
       return false
     }
 
-    if (isSuperAdmin(req.user)) {
+    if (isSuperAdmin(req.user) || isAdminUser(req.user)) {
       return true
     }
 
