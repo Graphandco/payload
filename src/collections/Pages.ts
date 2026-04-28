@@ -7,67 +7,20 @@ import {
   SimpleParagraphBlock,
   SimpleTextBlock,
 } from '../blocks'
+import {
+  createHideWhenEmptyCreateAccess,
+  createHideWhenEmptyReadAccess,
+  createSiteScopedManageAccess,
+  createSiteScopedReadAccess,
+  getDefaultUserSiteID,
+  getUserSiteIDs,
+  isSuperAdmin,
+} from '../lib/siteAccess'
 
-const SUPER_ADMIN_EMAIL = 'contact@graphandco.com'
-
-const isSuperAdmin = (user: any): boolean => user?.email === SUPER_ADMIN_EMAIL
-
-const getUserSiteIDs = (user: any): (number | string)[] => {
-  if (!Array.isArray(user?.sites)) {
-    return []
-  }
-
-  return user.sites
-    .map((site: any) => (typeof site === 'object' && site !== null ? site.id : site))
-    .filter(Boolean)
-}
-
-const getDefaultUserSiteID = (user: any): number | string | null => {
-  const siteIDs = getUserSiteIDs(user)
-  return siteIDs.length > 0 ? siteIDs[0] : null
-}
-
-const canReadPages: Access = ({ req }) => {
-  if (!req.user) {
-    return false
-  }
-
-  if (isSuperAdmin(req.user)) {
-    return true
-  }
-
-  const siteIDs = getUserSiteIDs(req.user)
-  if (siteIDs.length === 0) {
-    return false
-  }
-
-  return {
-    site: {
-      in: siteIDs,
-    },
-  }
-}
-
-const canManagePages: Access = ({ req }) => {
-  if (!req.user) {
-    return false
-  }
-
-  if (isSuperAdmin(req.user)) {
-    return true
-  }
-
-  const siteIDs = getUserSiteIDs(req.user)
-  if (siteIDs.length === 0) {
-    return false
-  }
-
-  return {
-    site: {
-      in: siteIDs,
-    },
-  }
-}
+const baseReadPages = createSiteScopedReadAccess()
+const canReadPages = createHideWhenEmptyReadAccess(baseReadPages, 'pages')
+const canCreatePages = createHideWhenEmptyCreateAccess('pages')
+const canManagePages: Access = createSiteScopedManageAccess()
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -76,7 +29,7 @@ export const Pages: CollectionConfig = {
   },
   access: {
     read: canReadPages,
-    create: ({ req }) => Boolean(req.user),
+    create: canCreatePages,
     update: canManagePages,
     delete: canManagePages,
   },

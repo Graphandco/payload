@@ -9,18 +9,25 @@ import {
   isSuperAdmin,
 } from '../lib/siteAccess'
 
-const baseReadMedia = createSiteScopedReadAccess()
-const canReadMedia = createHideWhenEmptyReadAccess(baseReadMedia, 'media')
-const canCreateMedia = createHideWhenEmptyCreateAccess('media')
-const canManageMedia: Access = createSiteScopedManageAccess()
+const baseReadCategories = createSiteScopedReadAccess()
+const canReadCategories = createHideWhenEmptyReadAccess(baseReadCategories, 'categories')
+const canCreateCategories = createHideWhenEmptyCreateAccess('categories')
+const canManageCategories: Access = createSiteScopedManageAccess()
 
-export const Media: CollectionConfig = {
-  slug: 'media',
+export const Categories: CollectionConfig = {
+  slug: 'categories',
+  labels: {
+    singular: 'Catégorie',
+    plural: 'Catégories',
+  },
+  admin: {
+    useAsTitle: 'name',
+  },
   access: {
-    read: canReadMedia,
-    create: canCreateMedia,
-    update: canManageMedia,
-    delete: canManageMedia,
+    read: canReadCategories,
+    create: canCreateCategories,
+    update: canManageCategories,
+    delete: canManageCategories,
   },
   fields: [
     {
@@ -52,11 +59,21 @@ export const Media: CollectionConfig = {
       },
     },
     {
-      name: 'alt',
+      name: 'name',
       type: 'text',
+      required: true,
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+    },
+    {
+      name: 'description',
+      type: 'textarea',
     },
   ],
-  upload: true,
   hooks: {
     beforeChange: [
       ({ req, data }) => {

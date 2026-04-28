@@ -10,6 +10,8 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Sites } from './collections/Sites'
 import { Pages } from './collections/Pages'
+import { Categories } from './collections/Categories'
+import { Products } from './collections/Products'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -40,7 +42,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Sites, Users, Pages, Media],
+  collections: [Sites, Users, Pages, Media, Categories, Products],
   i18n: {
     fallbackLanguage: 'fr',
     supportedLanguages: { fr },
