@@ -10,6 +10,7 @@ import { createSlugFromField } from '../lib/slug'
 
 const canCreateProducts = createHideWhenEmptyCreateAccess('products')
 const canManageProducts: Access = createSiteScopedManageAccess()
+const canReadProducts: Access = () => true
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -21,7 +22,7 @@ export const Products: CollectionConfig = {
     useAsTitle: 'name',
   },
   access: {
-    read: true,
+    read: canReadProducts,
     create: canCreateProducts,
     update: canManageProducts,
     delete: canManageProducts,

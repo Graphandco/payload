@@ -10,6 +10,7 @@ import { createSlugFromField } from '../lib/slug'
 
 const canCreateCategories = createHideWhenEmptyCreateAccess('categories')
 const canManageCategories: Access = createSiteScopedManageAccess()
+const canReadCategories: Access = () => true
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -21,7 +22,7 @@ export const Categories: CollectionConfig = {
     useAsTitle: 'name',
   },
   access: {
-    read: true,
+    read: canReadCategories,
     create: canCreateCategories,
     update: canManageCategories,
     delete: canManageCategories,

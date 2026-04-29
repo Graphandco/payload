@@ -18,6 +18,7 @@ import { createSlugFromField } from '../lib/slug'
 
 const canCreatePages = createHideWhenEmptyCreateAccess('pages')
 const canManagePages: Access = createSiteScopedManageAccess()
+const canReadPages: Access = () => true
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -25,7 +26,7 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
   },
   access: {
-    read: true,
+    read: canReadPages,
     create: canCreatePages,
     update: canManagePages,
     delete: canManagePages,
