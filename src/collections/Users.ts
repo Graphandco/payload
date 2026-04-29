@@ -1,15 +1,14 @@
 import type { Access, CollectionConfig } from 'payload'
+import { userIsAdmin } from '../lib/siteAccess'
 
-const isAdmin: Access = ({ req }) => {
-  return req.user?.role === 'admin'
-}
+const isAdmin: Access = async ({ req }) => userIsAdmin(req)
 
-const isAdminOrSelf: Access = ({ req }) => {
+const isAdminOrSelf: Access = async ({ req }) => {
   if (!req.user) {
     return false
   }
 
-  if (req.user.role === 'admin') {
+  if (await userIsAdmin(req)) {
     return true
   }
 
@@ -39,6 +38,7 @@ export const Users: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'editor',
+      saveToJWT: true,
       options: [
         {
           label: 'Admin',

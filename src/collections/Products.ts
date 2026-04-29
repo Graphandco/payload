@@ -4,7 +4,7 @@ import {
   createSiteScopedManageAccess,
   getDefaultUserSiteID,
   getUserSiteIDs,
-  isSuperAdmin,
+  isAdminUser,
 } from '../lib/siteAccess'
 import { createSlugFromField } from '../lib/slug'
 
@@ -34,10 +34,10 @@ export const Products: CollectionConfig = {
       relationTo: 'sites',
       required: true,
       admin: {
-        condition: (_, __, { user }) => isSuperAdmin(user),
+        condition: (_, __, { user }) => isAdminUser(user),
       },
       filterOptions: ({ req }) => {
-        if (isSuperAdmin(req.user)) {
+        if (isAdminUser(req.user)) {
           return true
         }
 
@@ -74,7 +74,7 @@ export const Products: CollectionConfig = {
         description: 'Catégories réutilisables (produits, blog, etc.).',
       },
       filterOptions: ({ req }) => {
-        if (isSuperAdmin(req.user)) {
+        if (isAdminUser(req.user)) {
           return true
         }
 
@@ -121,7 +121,7 @@ export const Products: CollectionConfig = {
     beforeValidate: [createSlugFromField('name')],
     beforeChange: [
       ({ req, data }) => {
-        if (isSuperAdmin(req.user)) {
+        if (isAdminUser(req.user)) {
           return data
         }
 

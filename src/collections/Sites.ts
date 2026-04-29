@@ -1,9 +1,8 @@
 import type { Access, CollectionConfig } from 'payload'
 import { createSlugFromField } from '../lib/slug'
+import { userIsAdmin } from '../lib/siteAccess'
 
-const isAdmin: Access = ({ req }) => {
-  return req.user?.role === 'admin'
-}
+const isAdmin: Access = async ({ req }) => userIsAdmin(req)
 
 export const Sites: CollectionConfig = {
   slug: 'sites',

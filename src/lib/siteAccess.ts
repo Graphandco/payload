@@ -1,9 +1,43 @@
 import type { Access } from 'payload'
 
-const SUPER_ADMIN_EMAIL = 'contact@graphandco.com'
-
-export const isSuperAdmin = (user: any): boolean => user?.email === SUPER_ADMIN_EMAIL
 export const isAdminUser = (user: any): boolean => user?.role === 'admin'
+
+/**
+ * True if the user has role `admin`.
+ * When `req.user.role` is missing (some auth/session shapes), loads the user once from DB (cached on `req.context`).
+ */
+export async function userIsAdmin(req: any): Promise<boolean> {
+  if (!req?.user) {
+    return false
+  }
+
+  const ctx = (req.context ??= {}) as { __isAdmin?: boolean }
+  if (typeof ctx.__isAdmin === 'boolean') {
+    return ctx.__isAdmin
+  }
+
+  const u = req.user
+  if (isAdminUser(u)) {
+    ctx.__isAdmin = true
+    return true
+  }
+
+  if ((u.role === undefined || u.role === null) && u.id && u.collection) {
+    const full = await req.payload.findByID({
+      collection: u.collection,
+      id: u.id,
+      depth: 0,
+      overrideAccess: true,
+      req,
+    })
+    const ok = full?.role === 'admin'
+    ctx.__isAdmin = ok
+    return ok
+  }
+
+  ctx.__isAdmin = false
+  return false
+}
 
 export const getUserSiteIDs = (user: any): (number | string)[] => {
   if (!Array.isArray(user?.sites)) {
@@ -45,12 +79,12 @@ export const hasVisibleDocsForSites = async (
 }
 
 export const createSiteScopedReadAccess = (siteField = 'site'): Access => {
-  return ({ req }) => {
+  return async ({ req }) => {
     if (!req.user) {
       return false
     }
 
-    if (isSuperAdmin(req.user) || isAdminUser(req.user)) {
+    if (await userIsAdmin(req)) {
       return true
     }
 
@@ -64,12 +98,12 @@ export const createSiteScopedReadAccess = (siteField = 'site'): Access => {
 }
 
 export const createSiteScopedManageAccess = (siteField = 'site'): Access => {
-  return ({ req }) => {
+  return async ({ req }) => {
     if (!req.user) {
       return false
     }
 
-    if (isSuperAdmin(req.user) || isAdminUser(req.user)) {
+    if (await userIsAdmin(req)) {
       return true
     }
 
@@ -106,7 +140,7 @@ export const createHideWhenEmptyCreateAccess = (collection: string, siteField = 
       return false
     }
 
-    if (isSuperAdmin(req.user) || isAdminUser(req.user)) {
+    if (await userIsAdmin(req)) {
       return true
     }
 

@@ -4,7 +4,7 @@ import {
   createSiteScopedManageAccess,
   getDefaultUserSiteID,
   getUserSiteIDs,
-  isSuperAdmin,
+  isAdminUser,
 } from '../lib/siteAccess'
 
 const canCreateMedia = createHideWhenEmptyCreateAccess('media')
@@ -26,10 +26,10 @@ export const Media: CollectionConfig = {
       relationTo: 'sites',
       required: true,
       admin: {
-        condition: (_, __, { user }) => isSuperAdmin(user),
+        condition: (_, __, { user }) => isAdminUser(user),
       },
       filterOptions: ({ req }) => {
-        if (isSuperAdmin(req.user)) {
+        if (isAdminUser(req.user)) {
           return true
         }
 
@@ -54,7 +54,7 @@ export const Media: CollectionConfig = {
   hooks: {
     beforeChange: [
       ({ req, data }) => {
-        if (isSuperAdmin(req.user)) {
+        if (isAdminUser(req.user)) {
           return data
         }
 
