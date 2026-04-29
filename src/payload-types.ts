@@ -26,6 +26,7 @@ export interface Config {
     media: Media;
     categories: Category;
     products: Product;
+    weights: Weight;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -39,6 +40,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    weights: WeightsSelect<false> | WeightsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -245,6 +247,18 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "weights".
+ */
+export interface Weight {
+  id: number;
+  site?: (number | null) | Site;
+  date: string;
+  poids: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -290,6 +304,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'weights';
+        value: number | Weight;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -477,6 +495,17 @@ export interface ProductsSelect<T extends boolean = true> {
   is_to_buy?: T;
   is_in_cart?: T;
   featuredImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "weights_select".
+ */
+export interface WeightsSelect<T extends boolean = true> {
+  site?: T;
+  date?: T;
+  poids?: T;
   updatedAt?: T;
   createdAt?: T;
 }
