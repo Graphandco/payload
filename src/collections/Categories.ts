@@ -1,17 +1,13 @@
 import type { Access, CollectionConfig } from 'payload'
 import {
   createHideWhenEmptyCreateAccess,
-  createHideWhenEmptyReadAccess,
   createSiteScopedManageAccess,
-  createSiteScopedReadAccess,
   getDefaultUserSiteID,
   getUserSiteIDs,
   isSuperAdmin,
 } from '../lib/siteAccess'
 import { createSlugFromField } from '../lib/slug'
 
-const baseReadCategories = createSiteScopedReadAccess()
-const canReadCategories = createHideWhenEmptyReadAccess(baseReadCategories, 'categories')
 const canCreateCategories = createHideWhenEmptyCreateAccess('categories')
 const canManageCategories: Access = createSiteScopedManageAccess()
 
@@ -25,7 +21,7 @@ export const Categories: CollectionConfig = {
     useAsTitle: 'name',
   },
   access: {
-    read: canReadCategories,
+    read: true,
     create: canCreateCategories,
     update: canManageCategories,
     delete: canManageCategories,

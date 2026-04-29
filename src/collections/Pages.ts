@@ -9,17 +9,13 @@ import {
 } from '../blocks'
 import {
   createHideWhenEmptyCreateAccess,
-  createHideWhenEmptyReadAccess,
   createSiteScopedManageAccess,
-  createSiteScopedReadAccess,
   getDefaultUserSiteID,
   getUserSiteIDs,
   isSuperAdmin,
 } from '../lib/siteAccess'
 import { createSlugFromField } from '../lib/slug'
 
-const baseReadPages = createSiteScopedReadAccess()
-const canReadPages = createHideWhenEmptyReadAccess(baseReadPages, 'pages')
 const canCreatePages = createHideWhenEmptyCreateAccess('pages')
 const canManagePages: Access = createSiteScopedManageAccess()
 
@@ -29,7 +25,7 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
   },
   access: {
-    read: canReadPages,
+    read: true,
     create: canCreatePages,
     update: canManagePages,
     delete: canManagePages,

@@ -1,38 +1,20 @@
 import type { Access, CollectionConfig } from 'payload'
 import {
-  buildSiteScopedConstraint,
   createHideWhenEmptyCreateAccess,
   createSiteScopedManageAccess,
   getDefaultUserSiteID,
   getUserSiteIDs,
-  isAdminUser,
   isSuperAdmin,
 } from '../lib/siteAccess'
 
-const canReadMediaPublicButScopedForUsers: Access = ({ req }) => {
-  if (!req.user) {
-    return true
-  }
-
-  if (isSuperAdmin(req.user) || isAdminUser(req.user)) {
-    return true
-  }
-
-  const siteIDs = getUserSiteIDs(req.user)
-  if (siteIDs.length === 0) {
-    return false
-  }
-
-  return buildSiteScopedConstraint(siteIDs, 'site')
-}
-
 const canCreateMedia = createHideWhenEmptyCreateAccess('media')
 const canManageMedia: Access = createSiteScopedManageAccess()
+const canReadMedia: Access = () => true
 
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
-    read: canReadMediaPublicButScopedForUsers,
+    read: canReadMedia,
     create: canCreateMedia,
     update: canManageMedia,
     delete: canManageMedia,
