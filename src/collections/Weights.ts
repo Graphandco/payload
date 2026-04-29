@@ -9,6 +9,7 @@ import {
 
 const canCreateWeights = createHideWhenEmptyCreateAccess('weights')
 const canManageWeights: Access = createSiteScopedManageAccess()
+const canReadWeights: Access = () => true
 
 export const Weights: CollectionConfig = {
   slug: 'weights',
@@ -20,7 +21,7 @@ export const Weights: CollectionConfig = {
     useAsTitle: 'date',
   },
   access: {
-    read: true,
+    read: canReadWeights,
     create: canCreateWeights,
     update: canManageWeights,
     delete: canManageWeights,
