@@ -1,6 +1,7 @@
 import type { Access, CollectionConfig } from 'payload'
 import {
   createHideWhenEmptyCreateAccess,
+  createSiteScopedManageAccess,
   getDefaultUserSiteID,
   getUserSiteIDs,
   isAdminUser,
@@ -8,7 +9,7 @@ import {
 } from '../lib/siteAccess'
 
 const canCreateWeights = createHideWhenEmptyCreateAccess('weights')
-const canManageWeights: Access = async ({ req }) => userIsAdmin(req)
+const canManageWeights: Access = createSiteScopedManageAccess()
 const canReadWeights: Access = () => true
 
 export const Weights: CollectionConfig = {
