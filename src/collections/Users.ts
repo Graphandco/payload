@@ -55,6 +55,7 @@ export const Users: CollectionConfig = {
       type: 'relationship',
       relationTo: 'sites',
       hasMany: true,
+      saveToJWT: true,
       admin: {
         description: 'Sites accessibles pour cet utilisateur.',
       },

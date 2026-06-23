@@ -1,4 +1,4 @@
-import type { Access } from 'payload'
+import type { Access, CollectionBeforeChangeHook, RelationshipField } from 'payload'
 
 export const isAdminUser = (user: any): boolean => user?.role === 'admin'
 
@@ -49,8 +49,49 @@ export const getUserSiteIDs = (user: any): (number | string)[] => {
     .filter(Boolean)
 }
 
+/**
+ * Site IDs for access control — uses JWT when present, otherwise loads the user once (cached on `req.context`).
+ */
+export async function getUserSiteIDsFromReq(req: any): Promise<(number | string)[]> {
+  if (!req?.user) {
+    return []
+  }
+
+  const ctx = (req.context ??= {}) as { __userSiteIDs?: (number | string)[] }
+  if (ctx.__userSiteIDs) {
+    return ctx.__userSiteIDs
+  }
+
+  const fromJWT = getUserSiteIDs(req.user)
+  if (fromJWT.length > 0) {
+    ctx.__userSiteIDs = fromJWT
+    return fromJWT
+  }
+
+  if (req.user.id && req.user.collection) {
+    const full = await req.payload.findByID({
+      collection: req.user.collection,
+      id: req.user.id,
+      depth: 0,
+      overrideAccess: true,
+      req,
+    })
+    const ids = getUserSiteIDs(full)
+    ctx.__userSiteIDs = ids
+    return ids
+  }
+
+  ctx.__userSiteIDs = []
+  return []
+}
+
 export const getDefaultUserSiteID = (user: any): number | string | null => {
   const siteIDs = getUserSiteIDs(user)
+  return siteIDs.length > 0 ? siteIDs[0] : null
+}
+
+export async function getDefaultUserSiteIDFromReq(req: any): Promise<number | string | null> {
+  const siteIDs = await getUserSiteIDsFromReq(req)
   return siteIDs.length > 0 ? siteIDs[0] : null
 }
 
@@ -78,6 +119,57 @@ export const hasVisibleDocsForSites = async (
   return result.docs.length > 0
 }
 
+const adminOnlySiteFieldAccess = {
+  read: async ({ req }: { req: any }) => userIsAdmin(req),
+  create: async ({ req }: { req: any }) => userIsAdmin(req),
+  update: async ({ req }: { req: any }) => userIsAdmin(req),
+}
+
+export const createSiteField = (): RelationshipField => ({
+  name: 'site',
+  type: 'relationship',
+  relationTo: 'sites',
+  required: true,
+  admin: {
+    condition: (_, __, { user }) => isAdminUser(user),
+  },
+  access: adminOnlySiteFieldAccess,
+  filterOptions: ({ req }) => {
+    if (isAdminUser(req.user)) {
+      return true
+    }
+
+    const siteIDs = getUserSiteIDs(req.user)
+    if (siteIDs.length === 0) {
+      return false
+    }
+
+    return {
+      id: {
+        in: siteIDs,
+      },
+    }
+  },
+})
+
+export const createAssignDefaultSiteBeforeChange =
+  (): CollectionBeforeChangeHook =>
+  async ({ req, data }) => {
+    if (await userIsAdmin(req)) {
+      return data
+    }
+
+    const defaultSiteID = await getDefaultUserSiteIDFromReq(req)
+    if (!defaultSiteID) {
+      throw new Error('No site is assigned to your user.')
+    }
+
+    return {
+      ...data,
+      site: defaultSiteID,
+    }
+  }
+
 export const createSiteScopedReadAccess = (siteField = 'site'): Access => {
   return async ({ req }) => {
     if (!req.user) {
@@ -88,7 +180,7 @@ export const createSiteScopedReadAccess = (siteField = 'site'): Access => {
       return true
     }
 
-    const siteIDs = getUserSiteIDs(req.user)
+    const siteIDs = await getUserSiteIDsFromReq(req)
     if (siteIDs.length === 0) {
       return false
     }
@@ -107,7 +199,7 @@ export const createSiteScopedManageAccess = (siteField = 'site'): Access => {
       return true
     }
 
-    const siteIDs = getUserSiteIDs(req.user)
+    const siteIDs = await getUserSiteIDsFromReq(req)
     if (siteIDs.length === 0) {
       return false
     }
@@ -121,7 +213,7 @@ export const createHideWhenEmptyReadAccess = (baseRead: Access, collection: stri
     const readAccess = await baseRead({ req })
 
     if (readAccess !== true && readAccess !== false) {
-      const siteIDs = getUserSiteIDs(req.user)
+      const siteIDs = await getUserSiteIDsFromReq(req)
       if (siteIDs.length === 0) {
         return false
       }
@@ -144,11 +236,45 @@ export const createHideWhenEmptyCreateAccess = (collection: string, siteField = 
       return true
     }
 
-    const siteIDs = getUserSiteIDs(req.user)
+    const siteIDs = await getUserSiteIDsFromReq(req)
     if (siteIDs.length === 0) {
       return false
     }
 
     return hasVisibleDocsForSites(req, collection, siteIDs, siteField)
+  }
+}
+
+export const createHideWhenEmptyAdminAccess = (
+  collection: string,
+  siteField = 'site',
+): (({ req }: { req: any }) => boolean | Promise<boolean>) => {
+  return async ({ req }) => {
+    if (!req.user) {
+      return false
+    }
+
+    if (await userIsAdmin(req)) {
+      return true
+    }
+
+    const siteIDs = await getUserSiteIDsFromReq(req)
+    if (siteIDs.length === 0) {
+      return false
+    }
+
+    return hasVisibleDocsForSites(req, collection, siteIDs, siteField)
+  }
+}
+
+export const createSiteScopedCollectionAccess = (collection: string, siteField = 'site') => {
+  const baseRead = createSiteScopedReadAccess(siteField)
+
+  return {
+    read: createHideWhenEmptyReadAccess(baseRead, collection, siteField),
+    create: createHideWhenEmptyCreateAccess(collection, siteField),
+    update: createSiteScopedManageAccess(siteField),
+    delete: createSiteScopedManageAccess(siteField),
+    admin: createHideWhenEmptyAdminAccess(collection, siteField),
   }
 }

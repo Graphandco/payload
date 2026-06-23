@@ -1,16 +1,14 @@
-import type { Access, CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
 import {
-  createHideWhenEmptyCreateAccess,
-  createSiteScopedManageAccess,
-  getDefaultUserSiteID,
+  createAssignDefaultSiteBeforeChange,
+  createSiteField,
+  createSiteScopedCollectionAccess,
   getUserSiteIDs,
   isAdminUser,
 } from '../lib/siteAccess'
 import { createSlugFromField } from '../lib/slug'
 
-const canCreateProducts = createHideWhenEmptyCreateAccess('products')
-const canManageProducts: Access = createSiteScopedManageAccess()
-const canReadProducts: Access = () => true
+const siteAccess = createSiteScopedCollectionAccess('products')
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -21,38 +19,9 @@ export const Products: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
   },
-  access: {
-    read: canReadProducts,
-    create: canCreateProducts,
-    update: canManageProducts,
-    delete: canManageProducts,
-  },
+  access: siteAccess,
   fields: [
-    {
-      name: 'site',
-      type: 'relationship',
-      relationTo: 'sites',
-      required: true,
-      admin: {
-        condition: (_, __, { user }) => isAdminUser(user),
-      },
-      filterOptions: ({ req }) => {
-        if (isAdminUser(req.user)) {
-          return true
-        }
-
-        const siteIDs = getUserSiteIDs(req.user)
-        if (siteIDs.length === 0) {
-          return false
-        }
-
-        return {
-          id: {
-            in: siteIDs,
-          },
-        }
-      },
-    },
+    createSiteField(),
     {
       name: 'name',
       label: 'Nom',
@@ -119,22 +88,6 @@ export const Products: CollectionConfig = {
   ],
   hooks: {
     beforeValidate: [createSlugFromField('name')],
-    beforeChange: [
-      ({ req, data }) => {
-        if (isAdminUser(req.user)) {
-          return data
-        }
-
-        const defaultSiteID = getDefaultUserSiteID(req.user)
-        if (!defaultSiteID) {
-          throw new Error('No site is assigned to your user.')
-        }
-
-        return {
-          ...data,
-          site: defaultSiteID,
-        }
-      },
-    ],
+    beforeChange: [createAssignDefaultSiteBeforeChange()],
   },
 }

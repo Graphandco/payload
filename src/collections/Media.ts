@@ -1,50 +1,17 @@
-import type { Access, CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
 import {
-  createHideWhenEmptyCreateAccess,
-  createSiteScopedManageAccess,
-  getDefaultUserSiteID,
-  getUserSiteIDs,
-  isAdminUser,
+  createAssignDefaultSiteBeforeChange,
+  createSiteField,
+  createSiteScopedCollectionAccess,
 } from '../lib/siteAccess'
 
-const canCreateMedia = createHideWhenEmptyCreateAccess('media')
-const canManageMedia: Access = createSiteScopedManageAccess()
-const canReadMedia: Access = () => true
+const siteAccess = createSiteScopedCollectionAccess('media')
 
 export const Media: CollectionConfig = {
   slug: 'media',
-  access: {
-    read: canReadMedia,
-    create: canCreateMedia,
-    update: canManageMedia,
-    delete: canManageMedia,
-  },
+  access: siteAccess,
   fields: [
-    {
-      name: 'site',
-      type: 'relationship',
-      relationTo: 'sites',
-      required: true,
-      admin: {
-        condition: (_, __, { user }) => isAdminUser(user),
-      },
-      filterOptions: ({ req }) => {
-        if (isAdminUser(req.user)) {
-          return true
-        }
-
-        const siteIDs = getUserSiteIDs(req.user)
-        if (siteIDs.length === 0) {
-          return false
-        }
-
-        return {
-          id: {
-            in: siteIDs,
-          },
-        }
-      },
-    },
+    createSiteField(),
     {
       name: 'alt',
       type: 'text',
@@ -52,22 +19,6 @@ export const Media: CollectionConfig = {
   ],
   upload: true,
   hooks: {
-    beforeChange: [
-      ({ req, data }) => {
-        if (isAdminUser(req.user)) {
-          return data
-        }
-
-        const defaultSiteID = getDefaultUserSiteID(req.user)
-        if (!defaultSiteID) {
-          throw new Error('No site is assigned to your user.')
-        }
-
-        return {
-          ...data,
-          site: defaultSiteID,
-        }
-      },
-    ],
+    beforeChange: [createAssignDefaultSiteBeforeChange()],
   },
 }
