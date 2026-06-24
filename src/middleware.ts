@@ -1,22 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getTenantKeyFromHostname, normalizeHostname } from '@/lib/siteDomain'
 
 const PAYLOAD_BYPASS_PREFIXES = ['/admin', '/api'] as const
-
-function normalizeHostname(host: string): string {
-  const withoutPort = host.split(':')[0]
-  return withoutPort.replace(/^www\./, '').toLowerCase()
-}
-
-function getTenantKey(hostname: string): string {
-  const domain = normalizeHostname(hostname)
-
-  if (domain.endsWith('.localhost')) {
-    return domain.slice(0, -'.localhost'.length)
-  }
-
-  return domain.replace(/\./g, '-')
-}
 
 function shouldBypass(pathname: string): boolean {
   if (pathname.startsWith('/_next')) return true
@@ -38,7 +24,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  const tenantKey = getTenantKey(hostname)
+  const tenantKey = getTenantKeyFromHostname(hostname)
   url.pathname = `/${tenantKey}${url.pathname === '/' ? '' : url.pathname}`
 
   const response = NextResponse.rewrite(url)
