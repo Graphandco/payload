@@ -38,6 +38,25 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+# Run Payload migrations (full source + deps, not standalone)
+FROM base AS migrate
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN \
+  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && corepack prepare pnpm@10.33.2 --activate && pnpm i --frozen-lockfile; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+COPY . .
+CMD \
+  if [ -f yarn.lock ]; then yarn run payload migrate; \
+  elif [ -f package-lock.json ]; then npm run payload migrate; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run migrate; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app

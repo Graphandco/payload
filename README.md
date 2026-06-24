@@ -1,67 +1,222 @@
-# Payload Blank Template
+# Payload — SaaS Click & Collect (multi-sites)
 
-This template comes configured with the bare minimum to get started on anything you need.
+Plateforme Payload CMS 3 + Next.js 16 pour gérer plusieurs restaurants (sites) depuis une seule instance. Chaque site est accessible via son propre domaine grâce au middleware Next.js.
 
-## Quick start
+## Stack
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+- **Payload CMS 3** + **Next.js 16** (App Router)
+- **PostgreSQL** (`@payloadcms/db-postgres`)
+- **Docker** (build standalone en production)
+- Reverse-proxy (Caddy) en prod pour les domaines custom
 
-## Quick Start - local setup
+## Prérequis
 
-To spin up this template locally, follow these steps:
+- Node.js ≥ 20
+- pnpm 10
+- PostgreSQL (local ou Docker)
+- Docker + réseau `web-network` (pour le déploiement VPS)
 
-### Clone
+## Variables d'environnement
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+Créer un fichier `.env` à la racine :
 
-### Development
+```env
+DATABASE_URL=postgres://USER:PASSWORD@127.0.0.1:5433/payload_db
+PAYLOAD_SECRET=une-chaine-secrete-longue
+```
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URL` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+## Développement local (recommandé)
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+```bash
+pnpm install
+pnpm dev
+```
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+- Admin : [http://localhost:3000/admin](http://localhost:3000/admin)
+- Au premier lancement, créer un utilisateur admin
 
-#### Docker (Optional)
+### Routage multi-domaines (dev)
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+Le middleware intercepte le hostname et réécrit vers `app/(frontend)/[domain]/`.
 
-To do so, follow these steps:
+| URL | Comportement |
+|-----|--------------|
+| `http://mamma.localhost:3000` | Rewrite → `/mamma` (slug = sous-domaine) |
+| `http://localhost:3000/admin` | Admin Payload (bypass middleware) |
+| `http://localhost:3000/api/*` | API Payload (bypass) |
 
-- Modify the `MONGODB_URL` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URL` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+Les navigateurs modernes résolvent `*.localhost` vers `127.0.0.1` sans `/etc/hosts`.
 
-## How it works
+En production, le domaine custom est stocké dans le champ `domain` de la collection `sites`. Le middleware dérive une clé de route sans point (ex. `pizzeria-mamma.fr` → `pizzeria-mamma-fr`).
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+### Sites (collection)
 
-### Collections
+| Champ | Rôle |
+|-------|------|
+| `name` | Nom affiché |
+| `slug` | Identifiant technique unique (`mamma`) — utilisé en dev comme `{slug}.localhost` |
+| `domain` | Domaine custom en prod (ex. `pizzeria-mamma.fr`), optionnel en dev |
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+**Accès :**
+- Visiteurs (front) : lecture publique
+- Éditeurs : uniquement leurs sites assignés
+- Admins : tous les sites
 
-- #### Users (Authentication)
+## Structure du projet
 
-  Users are auth-enabled collections that have access to the admin panel.
+```text
+src/
+├── app/
+│   ├── (payload)/          # Admin + API Payload
+│   └── (frontend)/         # Front multi-sites
+│       └── [domain]/       # Page tenant (rewrite middleware)
+├── collections/            # Sites, Users, Pages, Products, etc.
+├── components/admin/       # Composants custom admin Payload
+├── lib/
+│   ├── siteAccess.ts       # Accès scopé par site
+│   └── siteDomain.ts       # Helpers domaine (dev/prod)
+├── migrations/             # Migrations Postgres (prod)
+└── middleware.ts           # Routage par hostname
+```
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/3.x/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
+## Scripts
 
-- #### Media
+| Commande | Description |
+|----------|-------------|
+| `pnpm dev` | Serveur de dev (push schéma auto) |
+| `pnpm devsafe` | Dev avec cache `.next` vidé |
+| `pnpm build` | Build production Next.js |
+| `pnpm generate:types` | Régénère `payload-types.ts` |
+| `pnpm generate:importmap` | Régénère l'import map admin (après composant custom) |
+| `pnpm migrate` | Applique les migrations en attente |
+| `pnpm migrate:create` | Crée une migration après modif de collection |
+| `pnpm migrate:status` | État des migrations |
+| `pnpm deploy` | Deploy local via `scripts/deploy.sh` (Docker) |
 
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
+## Migrations base de données
 
-### Docker
+### Principe
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
+| Environnement | Mécanisme |
+|---------------|-----------|
+| **Dev** (`pnpm dev`) | `push: true` — Payload synchronise le schéma automatiquement |
+| **Prod** (Docker) | `push: false` — seules les migrations dans `src/migrations/` modifient la base |
 
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
+Payload enregistre les migrations appliquées dans la table `payload_migrations`.
 
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
+### Workflow : modifier le schéma
 
-## Questions
+1. Modifier une collection en local (`src/collections/…`)
+2. Lancer `pnpm dev` pour valider (push auto en dev)
+3. Générer la migration :
+   ```bash
+   pnpm migrate:create
+   ```
+4. **Relire** le fichier généré dans `src/migrations/` — vérifier qu'il est incrémental (`ALTER TABLE`, `ADD COLUMN`) et non une recréation complète du schéma
+5. Mettre à jour `src/migrations/index.ts` si nécessaire (souvent fait automatiquement)
+6. Commit + push
 
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+### Migrations actuelles
+
+| Fichier | Description |
+|---------|-------------|
+| `20260624_000000_baseline` | Point de départ (no-op) pour les déploiements existants |
+| `20260624_000001_add_site_domain` | Ajoute `domain` + index uniques sur `slug` et `domain` |
+
+### Tester les migrations en local
+
+```bash
+pnpm migrate:status
+pnpm migrate
+```
+
+## Docker
+
+### Dev local avec container
+
+```bash
+cp docker-compose.override.example.yml docker-compose.override.yml
+# Adapter DATABASE_URL dans l'override (réseau Docker vs hôte)
+docker compose up -d --build
+```
+
+> **Note :** En dev local, préférer `pnpm dev` pour bénéficier du hot-reload. Le container Docker pointe souvent vers une base différente de celle du `.env` local — les utilisateurs admin ne seront pas les mêmes.
+
+Pour aligner Docker sur la même base que `pnpm dev`, utiliser `host.docker.internal:5433` dans l'override à la place de `postgres-main:5432`.
+
+### Production (VPS)
+
+**Ne pas** lancer uniquement `docker compose up --build` — les migrations ne s'exécutent pas.
+
+```bash
+git pull
+bash scripts/deploy.sh
+```
+
+Le script `scripts/deploy.sh` :
+
+1. Build l'image Docker cible `migrate`
+2. Exécute `payload migrate` dans un container temporaire
+3. Build et démarre l'application (`docker compose up -d --build`)
+
+Aucun `pnpm` requis sur le VPS — tout passe par Docker.
+
+Variables optionnelles pour `deploy.sh` :
+
+```bash
+COMPOSE_NETWORK=web-network bash scripts/deploy.sh
+```
+
+### Dockerfile — cibles
+
+| Cible | Usage |
+|-------|-------|
+| `migrate` | Container éphémère pour `payload migrate` |
+| `runner` (défaut) | Image production standalone (`node server.js`) |
+
+## Déploiement
+
+1. Pousser le code sur le dépôt
+2. Sur le VPS :
+   ```bash
+   cd /var/www/docker-stack/payload
+   git pull
+   bash scripts/deploy.sh
+   ```
+3. Vérifier les logs :
+   ```bash
+   docker logs payload --tail 50
+   ```
+
+### Checklist après un changement de schéma
+
+- [ ] Migration créée et relue (`pnpm migrate:create`)
+- [ ] `src/migrations/index.ts` à jour
+- [ ] Commit + push
+- [ ] `bash scripts/deploy.sh` sur le VPS
+- [ ] Admin fonctionnel, pas d'erreur `column does not exist` dans les logs
+
+## Collections principales
+
+| Collection | Description |
+|------------|-------------|
+| `sites` | Restaurants / tenants |
+| `users` | Admins et éditeurs (accès scopé par site) |
+| `pages` | Pages CMS avec blocs |
+| `products` | Produits (scopés par site) |
+| `categories` | Catégories (scopées par site) |
+| `media` | Uploads (scopés par site) |
+
+## Médias
+
+Les fichiers uploadés sont montés via Docker :
+
+```yaml
+volumes:
+  - ./media:/app/media
+```
+
+## Ressources
+
+- [Documentation Payload](https://payloadcms.com/docs)
+- [Migrations Postgres Payload](https://payloadcms.com/docs/database/migrations)
