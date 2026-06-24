@@ -267,6 +267,44 @@ export const createHideWhenEmptyAdminAccess = (
   }
 }
 
+export const createSitesReadAccess = (): Access => {
+  return async ({ req }) => {
+    if (!req.user) {
+      return true
+    }
+
+    if (await userIsAdmin(req)) {
+      return true
+    }
+
+    const siteIDs = await getUserSiteIDsFromReq(req)
+    if (siteIDs.length === 0) {
+      return false
+    }
+
+    return {
+      id: {
+        in: siteIDs,
+      },
+    }
+  }
+}
+
+export const createSitesAdminAccess = (): (({ req }: { req: any }) => boolean | Promise<boolean>) => {
+  return async ({ req }) => {
+    if (!req.user) {
+      return false
+    }
+
+    if (await userIsAdmin(req)) {
+      return true
+    }
+
+    const siteIDs = await getUserSiteIDsFromReq(req)
+    return siteIDs.length > 0
+  }
+}
+
 export const createSiteScopedCollectionAccess = (collection: string, siteField = 'site') => {
   const baseRead = createSiteScopedReadAccess(siteField)
 

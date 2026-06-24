@@ -87,7 +87,14 @@ export interface UserAuthOperations {
 export interface Site {
   id: number;
   name: string;
+  /**
+   * Identifiant technique du site. En dev, le domaine local sera {slug}.localhost.
+   */
   slug: string;
+  /**
+   * Domaine custom en production (ex. pizzeria-mamma.fr). Optionnel en dev : si vide, {slug}.localhost est utilisé.
+   */
+  domain?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -358,6 +365,7 @@ export interface PayloadMigration {
 export interface SitesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  domain?: T;
   updatedAt?: T;
   createdAt?: T;
 }
