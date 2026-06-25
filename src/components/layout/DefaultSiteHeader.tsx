@@ -1,3 +1,6 @@
+/**
+ * En-tête du shell par défaut : logo, navigation et badge panier.
+ */
 import { CartBadge } from '@/components/cart/CartBadge'
 import { BurgerMenu } from '@/components/navigation/BurgerMenu'
 import { defaultSiteNavLinks } from '@/lib/siteNav'

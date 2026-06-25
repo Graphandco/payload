@@ -1,3 +1,7 @@
+/**
+ * Résout un site Payload à partir de la clé tenant (slug ou domaine)
+ * injectée par le middleware via l'en-tête x-tenant-domain.
+ */
 import configPromise from '@payload-config'
 import type { Site } from '@/payload-types'
 import { headers } from 'next/headers'

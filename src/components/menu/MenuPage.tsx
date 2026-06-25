@@ -1,3 +1,7 @@
+/**
+ * Page serveur /carte : charge produits et catégories du site,
+ * les groupe par catégorie puis délègue l'affichage à MenuView.
+ */
 import { MenuView } from '@/components/menu/MenuView'
 import { getCategoriesBySite } from '@/lib/getCategoriesBySite'
 import { getProductsBySite } from '@/lib/getProductsBySite'

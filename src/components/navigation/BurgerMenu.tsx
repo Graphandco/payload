@@ -1,3 +1,7 @@
+/**
+ * Menu burger responsive : liens de navigation desktop + panneau mobile.
+ * Le slot `actions` accueille des éléments à droite (ex. badge panier).
+ */
 'use client'
 
 import type { SiteNavLink } from '@/lib/siteNav'

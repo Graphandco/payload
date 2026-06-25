@@ -1,3 +1,7 @@
+/**
+ * Affichage client de la carte : sections par catégorie et lignes produit
+ * avec bouton d'ajout au panier (MenuProductRow).
+ */
 import { MenuProductRow } from '@/components/menu/MenuProductRow'
 import type { MenuSection } from '@/lib/groupProductsByCategory'
 import type { Site } from '@/payload-types'

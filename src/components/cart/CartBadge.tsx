@@ -1,3 +1,6 @@
+/**
+ * Lien panier dans le header avec compteur d'articles (icône Lucide).
+ */
 'use client'
 
 import { useCartItemCount } from '@/stores/cartStore'

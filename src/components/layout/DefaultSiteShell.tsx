@@ -1,3 +1,7 @@
+/**
+ * Shell par défaut pour les sites sans layout custom.
+ * Fournit header, footer et thème italien (default-shell.css).
+ */
 import { DefaultSiteFooter } from '@/components/layout/DefaultSiteFooter'
 import { DefaultSiteHeader } from '@/components/layout/DefaultSiteHeader'
 import type { Site } from '@/payload-types'

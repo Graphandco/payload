@@ -5,6 +5,28 @@
   --italy-terracotta: #b5523a;
   --italy-red: #9e2a2b;
   --italy-stone: #e8e2d9;
+
+  /* shadcn tokens */
+  --background: var(--italy-cream);
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+  --primary: var(--italy-green);
+  --primary-foreground: var(--italy-cream);
+  --secondary: var(--italy-stone);
+  --secondary-foreground: #1c1917;
+  --muted: var(--italy-stone);
+  --muted-foreground: #57534e;
+  --accent: var(--italy-stone);
+  --accent-foreground: var(--italy-green);
+  --destructive: var(--italy-red);
+  --border: var(--italy-stone);
+  --input: var(--italy-stone);
+  --ring: var(--italy-terracotta);
+  --radius: 0.375rem;
+
   background-color: var(--italy-cream);
   color: #1c1917;
 }
@@ -75,16 +97,6 @@
   color: var(--italy-terracotta);
 }
 
-.site-default .cart-add-btn {
-  background-color: var(--italy-green);
-  color: #faf7f2;
-  transition: background-color 0.15s ease;
-}
-
-.site-default .cart-add-btn:hover {
-  background-color: var(--italy-green-light);
-}
-
 .site-default .cart-badge-count {
   background-color: var(--italy-terracotta);
   color: white;
@@ -96,10 +108,6 @@
 
 .site-default .cart-line {
   border-color: var(--italy-stone);
-}
-
-.site-default .cart-qty-btn {
-  color: var(--italy-green);
 }
 
 .site-default .cms-page h1 {

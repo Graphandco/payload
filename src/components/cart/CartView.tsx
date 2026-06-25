@@ -1,5 +1,10 @@
+/**
+ * Panier client : liste des articles, quantités, total et actions (vider, retirer).
+ * Lit et met à jour le store Zustand persisté en localStorage, isolé par siteId.
+ */
 'use client'
 
+import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/formatPrice'
 import { useCartLines, useCartStore, useCartTotal } from '@/stores/cartStore'
 import Link from 'next/link'
@@ -46,9 +51,9 @@ export function CartView({ siteId }: Props) {
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="text-3xl font-semibold tracking-tight">Panier</h1>
-        <button type="button" className="text-sm text-neutral-600 underline" onClick={() => clearSite(siteId)}>
+        <Button type="button" variant="ghost" size="sm" onClick={() => clearSite(siteId)}>
           Vider le panier
-        </button>
+        </Button>
       </div>
 
       <ul className="list-none space-y-0 p-0">
@@ -60,33 +65,37 @@ export function CartView({ siteId }: Props) {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center rounded-md border">
-                <button
+              <div className="flex items-center rounded-md border border-border">
+                <Button
                   type="button"
-                  className="cart-qty-btn px-3 py-1"
+                  variant="ghost"
+                  size="icon-sm"
                   aria-label="Diminuer la quantité"
                   onClick={() => setQuantity(siteId, line.productId, line.quantity - 1)}
                 >
                   −
-                </button>
+                </Button>
                 <span className="min-w-8 text-center text-sm font-medium">{line.quantity}</span>
-                <button
+                <Button
                   type="button"
-                  className="cart-qty-btn px-3 py-1"
+                  variant="ghost"
+                  size="icon-sm"
                   aria-label="Augmenter la quantité"
                   onClick={() => setQuantity(siteId, line.productId, line.quantity + 1)}
                 >
                   +
-                </button>
+                </Button>
               </div>
               <strong className="menu-price min-w-20 text-right">{formatPrice(line.price * line.quantity)}</strong>
-              <button
+              <Button
                 type="button"
-                className="text-sm text-neutral-500 underline"
+                variant="link"
+                size="sm"
+                className="text-muted-foreground"
                 onClick={() => removeItem(siteId, line.productId)}
               >
                 Retirer
-              </button>
+              </Button>
             </div>
           </li>
         ))}

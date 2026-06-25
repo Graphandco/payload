@@ -2,6 +2,28 @@
   --lucelle-brand: #1a1a1a;
   --lucelle-bg: #faf8f5;
   --lucelle-accent: #8b4513;
+
+  /* shadcn tokens */
+  --background: var(--lucelle-bg);
+  --foreground: var(--lucelle-brand);
+  --card: #ffffff;
+  --card-foreground: var(--lucelle-brand);
+  --popover: #ffffff;
+  --popover-foreground: var(--lucelle-brand);
+  --primary: var(--lucelle-brand);
+  --primary-foreground: var(--lucelle-bg);
+  --secondary: #e5e5e5;
+  --secondary-foreground: var(--lucelle-brand);
+  --muted: #f5f5f5;
+  --muted-foreground: #525252;
+  --accent: #f5f5f5;
+  --accent-foreground: var(--lucelle-brand);
+  --destructive: #b91c1c;
+  --border: #d4d4d4;
+  --input: #d4d4d4;
+  --ring: var(--lucelle-accent);
+  --radius: 0.375rem;
+
   background-color: var(--lucelle-bg);
   color: var(--lucelle-brand);
 }
@@ -58,15 +80,6 @@
 .site-lucelle .menu-price {
   font-variant-numeric: tabular-nums;
   color: var(--lucelle-accent);
-}
-
-.site-lucelle .cart-add-btn {
-  background-color: var(--lucelle-brand);
-  color: #faf8f5;
-}
-
-.site-lucelle .cart-add-btn:hover {
-  background-color: #333333;
 }
 
 .site-lucelle .cart-badge-count {

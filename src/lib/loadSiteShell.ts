@@ -1,3 +1,7 @@
+/**
+ * Charge un layout React custom par slug de site (ex. lucelle-app).
+ * Retourne null si aucun shell custom n'est enregistré → DefaultSiteShell.
+ */
 import type { ComponentType, ReactNode } from 'react'
 import type { Site } from '@/payload-types'
 

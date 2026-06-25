@@ -1,3 +1,6 @@
+/**
+ * Pied de page du shell par défaut.
+ */
 import type { Site } from '@/payload-types'
 
 type Props = {

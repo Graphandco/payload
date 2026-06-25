@@ -1,3 +1,6 @@
+/**
+ * En-tête custom Lucelle : logo, navigation et badge panier.
+ */
 import { CartBadge } from '@/components/cart/CartBadge'
 import type { Site } from '@/payload-types'
 import Link from 'next/link'

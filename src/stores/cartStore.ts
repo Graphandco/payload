@@ -1,3 +1,7 @@
+/**
+ * Store panier multi-tenant (Zustand + localStorage).
+ * Chaque site a son propre panier, identifié par siteId.
+ */
 'use client'
 
 import { create } from 'zustand'

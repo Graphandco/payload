@@ -1,3 +1,7 @@
+/**
+ * Charge une page d'accueil React custom par slug de site.
+ * Priorité sur la page CMS « accueil » quand un loader est enregistré.
+ */
 import type { ComponentType } from 'react'
 import type { Site } from '@/payload-types'
 

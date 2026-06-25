@@ -1,3 +1,7 @@
+/**
+ * Layout par domaine : charge le site Payload et enveloppe toutes les pages
+ * dans le shell approprié (default ou custom, ex. lucelle-app).
+ */
 import { DefaultSiteShell } from '@/components/layout/DefaultSiteShell'
 import { getSiteByTenant } from '@/lib/getSiteByTenant'
 import { loadSiteShell } from '@/lib/loadSiteShell'

@@ -1,3 +1,7 @@
+/**
+ * Page d'accueil custom pour lucelle-app.
+ * Prioritaire sur la page CMS « accueil » (voir loadCustomHome).
+ */
 import type { Site } from '@/payload-types'
 import Link from 'next/link'
 

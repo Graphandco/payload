@@ -1,3 +1,8 @@
+/**
+ * Routeur principal du front multi-tenant.
+ * Résout chaque URL ({slug}.localhost/chemin) vers : accueil custom, page CMS,
+ * page React custom, routes métier partagées (/carte, /panier) ou 404.
+ */
 import { CmsPageView } from '@/components/cms/CmsPageView'
 import { CartPage, isCartPath } from '@/components/cart/CartPage'
 import { isMenuPath, MenuPage } from '@/components/menu/MenuPage'

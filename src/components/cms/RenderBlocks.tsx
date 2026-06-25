@@ -1,3 +1,6 @@
+/**
+ * Mappe les blocs Payload (texte, image, galerie…) vers des composants React front.
+ */
 import type { Media, Page } from '@/payload-types'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import Image from 'next/image'

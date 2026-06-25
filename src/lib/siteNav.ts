@@ -1,3 +1,6 @@
+/**
+ * Liens de navigation partagés par le shell par défaut.
+ */
 export type SiteNavLink = {
   href: string
   label: string

@@ -1,9 +1,15 @@
+/**
+ * Ligne produit sur la carte (client) : image, prix et bouton « Ajouter »
+ * qui alimente le store Zustand du site courant.
+ */
 'use client'
 
+import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/formatPrice'
 import { useCartStore } from '@/stores/cartStore'
 import type { Media, Product } from '@/payload-types'
 import Image from 'next/image'
+import { toast } from 'sonner'
 
 type Props = {
   siteId: number
@@ -17,6 +23,11 @@ function resolveMedia(media: number | Media | null | undefined): Media | null {
 export function MenuProductRow({ siteId, product }: Props) {
   const addItem = useCartStore((state) => state.addItem)
   const image = resolveMedia(product.featuredImage)
+
+  const handleAdd = () => {
+    addItem(siteId, { id: product.id, name: product.name, price: product.price })
+    toast.success(`${product.name} ajouté au panier`)
+  }
 
   return (
     <li className="menu-item flex items-center gap-4 border-b py-3">
@@ -34,13 +45,14 @@ export function MenuProductRow({ siteId, product }: Props) {
           <span className="font-medium">{product.name}</span>
           <strong className="menu-price shrink-0">{formatPrice(product.price)}</strong>
         </div>
-        <button
+        <Button
           type="button"
-          className="cart-add-btn shrink-0 rounded-md px-4 py-2 text-sm font-medium"
-          onClick={() => addItem(siteId, { id: product.id, name: product.name, price: product.price })}
+          size="sm"
+          className="shrink-0"
+          onClick={handleAdd}
         >
           Ajouter
-        </button>
+        </Button>
       </div>
     </li>
   )

@@ -1,3 +1,7 @@
+/**
+ * Charge une page React custom pour un chemin donné (ex. lucelle-app/carte).
+ * Priorité sur les routes partagées et les pages CMS pour ce chemin.
+ */
 import type { ComponentType } from 'react'
 import type { Site } from '@/payload-types'
 

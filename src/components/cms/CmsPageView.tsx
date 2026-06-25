@@ -1,3 +1,6 @@
+/**
+ * Rendu d'une page CMS Payload : titre + blocs de contenu (RenderBlocks).
+ */
 import { RenderBlocks } from '@/components/cms/RenderBlocks'
 import type { Page, Site } from '@/payload-types'
 

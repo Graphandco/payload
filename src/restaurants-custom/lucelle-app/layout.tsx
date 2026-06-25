@@ -1,3 +1,7 @@
+/**
+ * Shell custom Lucelle : header, footer et thème propre (lucelle.css).
+ * Enregistré dans loadSiteShell pour le slug lucelle-app.
+ */
 import type { Site } from '@/payload-types'
 import type { ReactNode } from 'react'
 import { LucelleFooter } from './components/Footer'

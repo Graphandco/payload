@@ -1,3 +1,6 @@
+/**
+ * Point d'entrée serveur de /panier : passe le siteId au composant client CartView.
+ */
 import { CartView } from '@/components/cart/CartView'
 import type { Site } from '@/payload-types'
 

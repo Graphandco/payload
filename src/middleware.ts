@@ -1,3 +1,7 @@
+/**
+ * Middleware multi-tenant : extrait le sous-domaine (ex. lucelle-app.localhost)
+ * et réécrit les requêtes vers /[domain]/… pour le routing Next.js.
+ */
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getTenantKeyFromHostname, normalizeHostname } from '@/lib/siteDomain'
