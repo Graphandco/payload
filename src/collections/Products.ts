@@ -2,13 +2,13 @@ import type { CollectionConfig } from 'payload'
 import {
   createAssignDefaultSiteBeforeChange,
   createSiteField,
-  createSiteScopedCollectionAccess,
+  createPublicSiteScopedCollectionAccess,
   getUserSiteIDs,
   isAdminUser,
 } from '../lib/siteAccess'
 import { createSlugFromField } from '../lib/slug'
 
-const siteAccess = createSiteScopedCollectionAccess('products')
+const siteAccess = createPublicSiteScopedCollectionAccess('products')
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -35,6 +35,16 @@ export const Products: CollectionConfig = {
       unique: true,
     },
     {
+      name: 'price',
+      label: 'Prix (€)',
+      type: 'number',
+      required: true,
+      min: 0,
+      admin: {
+        step: 0.01,
+      },
+    },
+    {
       name: 'categories',
       type: 'relationship',
       relationTo: 'categories',
@@ -58,26 +68,6 @@ export const Products: CollectionConfig = {
           },
         }
       },
-    },
-    {
-      name: 'quantity',
-      label: 'Quantité',
-      type: 'number',
-      defaultValue: 1,
-      required: true,
-      min: 1,
-    },
-    {
-      name: 'is_to_buy',
-      label: 'À acheter',
-      type: 'checkbox',
-      defaultValue: false,
-    },
-    {
-      name: 'is_in_cart',
-      label: 'Dans le panier',
-      type: 'checkbox',
-      defaultValue: false,
     },
     {
       name: 'featuredImage',

@@ -2,11 +2,11 @@ import type { CollectionConfig } from 'payload'
 import {
   createAssignDefaultSiteBeforeChange,
   createSiteField,
-  createSiteScopedCollectionAccess,
+  createPublicSiteScopedCollectionAccess,
 } from '../lib/siteAccess'
 import { createSlugFromField } from '../lib/slug'
 
-const siteAccess = createSiteScopedCollectionAccess('categories')
+const siteAccess = createPublicSiteScopedCollectionAccess('categories')
 
 export const Categories: CollectionConfig = {
   slug: 'categories',

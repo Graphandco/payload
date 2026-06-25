@@ -12,7 +12,6 @@ import { Sites } from './collections/Sites'
 import { Pages } from './collections/Pages'
 import { Categories } from './collections/Categories'
 import { Products } from './collections/Products'
-import { Weights } from './collections/Weights'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -43,7 +42,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Sites, Users, Pages, Media, Categories, Products, Weights],
+  collections: [Sites, Users, Pages, Media, Categories, Products],
   i18n: {
     fallbackLanguage: 'fr',
     supportedLanguages: { fr },
@@ -58,7 +57,7 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
     migrationDir: path.resolve(dirname, 'migrations'),
-    push: process.env.NODE_ENV !== 'production',
+    push: false,
   }),
   sharp,
   plugins: [],

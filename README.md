@@ -319,7 +319,7 @@ src/
 
 | Environnement | Mécanisme |
 |---------------|-----------|
-| **Dev** (`pnpm dev`) | `push: true` — Payload synchronise le schéma automatiquement |
+| **Dev** (`pnpm dev`) | `push: false` — appliquer les migrations avec `pnpm migrate` après modif de schéma |
 | **Prod** (Docker) | `push: false` — seules les migrations dans `src/migrations/` modifient la base |
 
 Payload enregistre les migrations appliquées dans la table `payload_migrations`.
@@ -327,13 +327,10 @@ Payload enregistre les migrations appliquées dans la table `payload_migrations`
 ### Workflow : modifier le schéma
 
 1. Modifier une collection en local (`src/collections/…`)
-2. Lancer `pnpm dev` pour valider (push auto en dev)
-3. Générer la migration :
-   ```bash
-   pnpm migrate:create
-   ```
-4. **Relire** le fichier généré dans `src/migrations/` — vérifier qu'il est incrémental (`ALTER TABLE`, `ADD COLUMN`) et non une recréation complète du schéma
-5. Mettre à jour `src/migrations/index.ts` si nécessaire (souvent fait automatiquement)
+2. Générer la migration : `pnpm migrate:create`
+3. Relire le fichier dans `src/migrations/`
+4. Appliquer en local : `yes | pnpm migrate` (ou `pnpm migrate` puis confirmer)
+5. Lancer `pnpm dev` pour valider
 6. Commit + push
 
 ### Migrations actuelles
@@ -342,6 +339,7 @@ Payload enregistre les migrations appliquées dans la table `payload_migrations`
 |---------|-------------|
 | `20260624_000000_baseline` | Point de départ (no-op) pour les déploiements existants |
 | `20260624_000001_add_site_domain` | Ajoute `domain` + index uniques sur `slug` et `domain` |
+| `20260624_000002_cleanup_products_drop_weights` | Supprime `weights`, retire `quantity`/`is_to_buy`/`is_in_cart` sur `products`, ajoute `price` |
 
 ### Tester les migrations en local
 

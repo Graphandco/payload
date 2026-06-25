@@ -2,10 +2,10 @@ import type { CollectionConfig } from 'payload'
 import {
   createAssignDefaultSiteBeforeChange,
   createSiteField,
-  createSiteScopedCollectionAccess,
+  createPublicSiteScopedCollectionAccess,
 } from '../lib/siteAccess'
 
-const siteAccess = createSiteScopedCollectionAccess('media')
+const siteAccess = createPublicSiteScopedCollectionAccess('media')
 
 export const Media: CollectionConfig = {
   slug: 'media',
