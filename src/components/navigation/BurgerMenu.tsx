@@ -7,6 +7,7 @@ import { useEffect, useId, useState } from 'react'
 type Props = {
   siteName: string
   links: SiteNavLink[]
+  actions?: React.ReactNode
   logoClassName?: string
   navClassName?: string
   linkClassName?: string
@@ -17,6 +18,7 @@ type Props = {
 export function BurgerMenu({
   siteName,
   links,
+  actions,
   logoClassName = '',
   navClassName = '',
   linkClassName = '',
@@ -59,33 +61,37 @@ export function BurgerMenu({
           {siteName}
         </Link>
 
-        <button
-          type="button"
-          className={`relative z-50 flex size-10 items-center justify-center rounded-md md:hidden ${buttonClassName}`}
-          aria-expanded={open}
-          aria-controls={panelId}
-          aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="sr-only">{open ? 'Fermer' : 'Menu'}</span>
-          <span className="flex flex-col gap-1.5">
-            <span
-              className={`block h-0.5 w-5 bg-current transition-transform ${open ? 'translate-y-2 rotate-45' : ''}`}
-            />
-            <span className={`block h-0.5 w-5 bg-current transition-opacity ${open ? 'opacity-0' : ''}`} />
-            <span
-              className={`block h-0.5 w-5 bg-current transition-transform ${open ? '-translate-y-2 -rotate-45' : ''}`}
-            />
-          </span>
-        </button>
+        <div className="flex items-center gap-3 md:gap-6">
+          <button
+            type="button"
+            className={`relative z-50 flex size-10 items-center justify-center rounded-md md:hidden ${buttonClassName}`}
+            aria-expanded={open}
+            aria-controls={panelId}
+            aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="sr-only">{open ? 'Fermer' : 'Menu'}</span>
+            <span className="flex flex-col gap-1.5">
+              <span
+                className={`block h-0.5 w-5 bg-current transition-transform ${open ? 'translate-y-2 rotate-45' : ''}`}
+              />
+              <span className={`block h-0.5 w-5 bg-current transition-opacity ${open ? 'opacity-0' : ''}`} />
+              <span
+                className={`block h-0.5 w-5 bg-current transition-transform ${open ? '-translate-y-2 -rotate-45' : ''}`}
+              />
+            </span>
+          </button>
 
-        <nav className={`hidden items-center gap-6 text-sm font-medium md:flex ${navClassName}`}>
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className={`no-underline ${linkClassName}`}>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+          <nav className={`hidden items-center gap-6 text-sm font-medium md:flex ${navClassName}`}>
+            {links.map((link) => (
+              <Link key={link.href} href={link.href} className={`no-underline ${linkClassName}`}>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {actions}
+        </div>
       </div>
 
       {open ? (

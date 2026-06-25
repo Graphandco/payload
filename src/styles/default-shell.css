@@ -75,6 +75,33 @@
   color: var(--italy-terracotta);
 }
 
+.site-default .cart-add-btn {
+  background-color: var(--italy-green);
+  color: #faf7f2;
+  transition: background-color 0.15s ease;
+}
+
+.site-default .cart-add-btn:hover {
+  background-color: var(--italy-green-light);
+}
+
+.site-default .cart-badge-count {
+  background-color: var(--italy-terracotta);
+  color: white;
+}
+
+.site-default .cart-link {
+  color: var(--italy-terracotta);
+}
+
+.site-default .cart-line {
+  border-color: var(--italy-stone);
+}
+
+.site-default .cart-qty-btn {
+  color: var(--italy-green);
+}
+
 .site-default .cms-page h1 {
   font-family: Georgia, 'Times New Roman', serif;
   color: var(--italy-green);

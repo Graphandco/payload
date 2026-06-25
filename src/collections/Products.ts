@@ -52,7 +52,19 @@ export const Products: CollectionConfig = {
       admin: {
         description: 'Catégories réutilisables (produits, blog, etc.).',
       },
-      filterOptions: ({ req }) => {
+      filterOptions: ({ req, siblingData }) => {
+        const data = siblingData as { site?: number | { id: number } | null }
+        const productSiteId =
+          typeof data?.site === 'object' && data.site !== null ? data.site.id : data?.site
+
+        if (productSiteId) {
+          return {
+            site: {
+              equals: productSiteId,
+            },
+          }
+        }
+
         if (isAdminUser(req.user)) {
           return true
         }

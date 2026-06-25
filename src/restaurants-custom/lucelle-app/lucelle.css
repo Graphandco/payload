@@ -59,3 +59,25 @@
   font-variant-numeric: tabular-nums;
   color: var(--lucelle-accent);
 }
+
+.site-lucelle .cart-add-btn {
+  background-color: var(--lucelle-brand);
+  color: #faf8f5;
+}
+
+.site-lucelle .cart-add-btn:hover {
+  background-color: #333333;
+}
+
+.site-lucelle .cart-badge-count {
+  background-color: var(--lucelle-accent);
+  color: white;
+}
+
+.site-lucelle .cart-link {
+  color: var(--lucelle-accent);
+}
+
+.site-lucelle .cart-line {
+  border-color: #e5e5e5;
+}

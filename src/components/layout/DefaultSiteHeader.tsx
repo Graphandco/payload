@@ -1,3 +1,4 @@
+import { CartBadge } from '@/components/cart/CartBadge'
 import { BurgerMenu } from '@/components/navigation/BurgerMenu'
 import { defaultSiteNavLinks } from '@/lib/siteNav'
 import type { Site } from '@/payload-types'
@@ -18,6 +19,7 @@ export function DefaultSiteHeader({ site }: Props) {
         <BurgerMenu
           siteName={site.name}
           links={defaultSiteNavLinks}
+          actions={<CartBadge siteId={site.id} className="default-nav-link text-sm font-medium" />}
           logoClassName="default-logo"
           navClassName="default-nav"
           linkClassName="default-nav-link"
