@@ -425,6 +425,21 @@ COMPOSE_NETWORK=web-network bash scripts/deploy.sh
 | `categories` | Catégories (scopées par site) |
 | `media` | Uploads (scopés par site) |
 
+## Menu / carte (catalogue)
+
+Helpers :
+
+| Fichier | Rôle |
+|---------|------|
+| `getCategoriesBySite` | Catégories d'un site |
+| `getProductsBySite` | Produits avec catégories et image (`depth: 2`) |
+| `groupProductsByCategory` | Regroupe les produits par catégorie |
+| `components/menu/MenuView` | Affichage carte (nom, prix, image) |
+
+Exemple en place : `/carte` pour `lucelle-app` (`restaurants-custom/lucelle-app/carte/page.tsx`).
+
+Dans l'admin : créer des **catégories** et des **produits** (avec prix) pour le site, puis les assigner. Les produits sans catégorie apparaissent dans « Autres ».
+
 ## Médias
 
 Les fichiers uploadés sont montés via Docker :
