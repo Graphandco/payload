@@ -8,9 +8,11 @@ type Props = {
 
 export function CmsPageView({ page }: Props) {
   return (
-    <>
+    <article className="cms-page">
       <h1>{page.title}</h1>
-      <RenderBlocks blocks={page.layout} />
-    </>
+      <div className="cms-content">
+        <RenderBlocks blocks={page.layout} />
+      </div>
+    </article>
   )
 }

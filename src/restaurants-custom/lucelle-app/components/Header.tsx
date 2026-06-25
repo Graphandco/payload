@@ -5,26 +5,24 @@ type Props = {
   site: Site
 }
 
+const navLinks = [
+  { href: '/', label: 'Accueil' },
+  { href: '/carte', label: 'Carte' },
+  { href: '/contact', label: 'Contact' },
+]
+
 export function LucelleHeader({ site }: Props) {
   return (
-    <header
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '1rem',
-        padding: '1rem 1.5rem',
-        borderBottom: '2px solid #1a1a1a',
-        background: '#faf8f5',
-      }}
-    >
-      <Link href="/" style={{ fontWeight: 700, fontSize: '1.25rem', textDecoration: 'none', color: 'inherit' }}>
+    <header className="lucelle-header flex items-center justify-between gap-4 px-6 py-4">
+      <Link href="/" className="lucelle-logo text-xl font-bold text-inherit no-underline">
         {site.name}
       </Link>
-      <nav style={{ display: 'flex', gap: '1.25rem', fontSize: '0.95rem' }}>
-        <Link href="/">Accueil</Link>
-        <Link href="/carte">Carte</Link>
-        <Link href="/contact">Contact</Link>
+      <nav className="lucelle-nav flex gap-5 text-sm">
+        {navLinks.map((link) => (
+          <Link key={link.href} href={link.href}>
+            {link.label}
+          </Link>
+        ))}
       </nav>
     </header>
   )

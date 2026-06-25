@@ -8,14 +8,14 @@ type Props = {
 
 export function DefaultSiteShell({ site, children }: Props) {
   return (
-    <>
-      <header style={{ padding: '1rem', borderBottom: '1px solid #eee' }}>
-        <strong>{site.name}</strong>
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b border-neutral-200 px-4 py-4">
+        <strong className="text-lg">{site.name}</strong>
       </header>
-      <main>{children}</main>
-      <footer style={{ padding: '1rem', borderTop: '1px solid #eee', fontSize: '0.875rem' }}>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">{children}</main>
+      <footer className="border-t border-neutral-200 px-4 py-4 text-sm text-neutral-600">
         © {site.name}
       </footer>
-    </>
+    </div>
   )
 }

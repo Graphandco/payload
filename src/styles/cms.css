@@ -1,0 +1,28 @@
+.cms-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cms-page h1 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.cms-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: #262626;
+}
+
+.cms-content p {
+  line-height: 1.625;
+}
+
+.cms-content img {
+  height: auto;
+  width: 100%;
+  border-radius: 0.375rem;
+}

@@ -6,22 +6,11 @@ type Props = {
 
 export function LucelleFooter({ site }: Props) {
   return (
-    <footer
-      style={{
-        marginTop: 'auto',
-        padding: '1.5rem',
-        borderTop: '1px solid #ddd',
-        background: '#1a1a1a',
-        color: '#f5f5f5',
-        fontSize: '0.875rem',
-      }}
-    >
-      <p style={{ margin: '0 0 0.5rem' }}>
+    <footer className="lucelle-footer mt-auto px-6 py-6 text-sm">
+      <p className="mb-2">
         <strong>{site.name}</strong> — restaurant démo Lucelle
       </p>
-      <p style={{ margin: 0, opacity: 0.8 }}>
-        12 rue des Lilas, Strasbourg · Ouvert du mardi au samedi
-      </p>
+      <p className="opacity-80">12 rue des Lilas, Strasbourg · Ouvert du mardi au samedi</p>
     </footer>
   )
 }

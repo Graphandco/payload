@@ -425,6 +425,27 @@ COMPOSE_NETWORK=web-network bash scripts/deploy.sh
 | `categories` | Catégories (scopées par site) |
 | `media` | Uploads (scopés par site) |
 
+## Styles (front)
+
+Tailwind CSS est limité au **front** (`app/(frontend)/`), pas à l'admin Payload.
+
+```text
+src/styles/
+├── globals.css     # @import tailwindcss + @source (scan des composants front)
+└── cms.css         # classes .cms-page, .cms-content (pages Payload)
+
+restaurants-custom/{slug}/
+└── {slug}.css      # identité visuelle du site (importé dans layout.tsx)
+```
+
+| Niveau | Fichier | Usage |
+|--------|---------|--------|
+| Global | `globals.css` | Utilitaires Tailwind (`flex`, `gap-4`, etc.) |
+| CMS | `cms.css` | Pages éditoriales (`CmsPageView`) |
+| Site | `lucelle.css` | Classe racine `.site-lucelle` + overrides (header, menu, couleurs) |
+
+Nouveau site custom : créer `{slug}.css`, wrapper `site-{slug}` dans le layout, importer le CSS dans `layout.tsx`.
+
 ## Menu / carte (catalogue)
 
 Helpers :

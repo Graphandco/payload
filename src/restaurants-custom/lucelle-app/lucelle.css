@@ -1,0 +1,61 @@
+.site-lucelle {
+  --lucelle-brand: #1a1a1a;
+  --lucelle-bg: #faf8f5;
+  --lucelle-accent: #8b4513;
+  background-color: var(--lucelle-bg);
+  color: var(--lucelle-brand);
+}
+
+.site-lucelle .lucelle-header {
+  border-bottom: 2px solid var(--lucelle-brand);
+  background-color: var(--lucelle-bg);
+}
+
+.site-lucelle .lucelle-logo {
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: -0.02em;
+}
+
+.site-lucelle .lucelle-nav a {
+  color: #404040;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-lucelle .lucelle-nav a:hover {
+  color: #0a0a0a;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.site-lucelle .lucelle-footer {
+  background-color: var(--lucelle-brand);
+  color: #f5f5f5;
+}
+
+.site-lucelle .lucelle-link {
+  font-weight: 500;
+  color: var(--lucelle-accent);
+  text-decoration: none;
+}
+
+.site-lucelle .lucelle-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.site-lucelle .menu-section-title {
+  border-bottom: 1px solid #d4d4d4;
+  padding-bottom: 0.5rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+}
+
+.site-lucelle .menu-item {
+  border-color: #e5e5e5;
+}
+
+.site-lucelle .menu-price {
+  font-variant-numeric: tabular-nums;
+  color: var(--lucelle-accent);
+}
