@@ -48,7 +48,7 @@ export function MenuView({ site, sections }: Props) {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <p className="text-sm text-neutral-600">{site.name}</p>
+        {/* <p className="text-sm text-neutral-600">{site.name}</p> */}
         <h1 className="text-3xl font-semibold tracking-tight">La carte</h1>
       </div>
 

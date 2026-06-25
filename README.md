@@ -446,6 +446,8 @@ restaurants-custom/{slug}/
 
 Nouveau site custom : créer `{slug}.css`, wrapper `site-{slug}` dans le layout, importer le CSS dans `layout.tsx`.
 
+**Template par défaut** (`DefaultSiteShell`) : palette italienne (crème, vert bouteille, terracotta, bandeau tricolore), header sticky avec burger menu, footer vert. Utilisé pour tout site sans shell custom dans `loadSiteShell`. Liens nav : `src/lib/siteNav.ts` (`defaultSiteNavLinks`).
+
 ## Menu / carte (catalogue)
 
 Helpers :
@@ -457,7 +459,9 @@ Helpers :
 | `groupProductsByCategory` | Regroupe les produits par catégorie |
 | `components/menu/MenuView` | Affichage carte (nom, prix, image) |
 
-Exemple en place : `/carte` pour `lucelle-app` (`restaurants-custom/lucelle-app/carte/page.tsx`).
+Exemple custom : `/carte` pour `lucelle-app` peut surcharger le catalogue via `loadCustomPage`.
+
+**Route partagée `/carte`** : pour tout site sans page custom, affiche automatiquement le catalogue produits (`MenuPage` + `MenuView`). Priorité : custom → catalogue → CMS (slug `carte`) → 404.
 
 Dans l'admin : créer des **catégories** et des **produits** (avec prix) pour le site, puis les assigner. Les produits sans catégorie apparaissent dans « Autres ».
 

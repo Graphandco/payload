@@ -1,0 +1,81 @@
+.site-default {
+  --italy-cream: #faf7f2;
+  --italy-green: #1a4d3e;
+  --italy-green-light: #2d6a4f;
+  --italy-terracotta: #b5523a;
+  --italy-red: #9e2a2b;
+  --italy-stone: #e8e2d9;
+  background-color: var(--italy-cream);
+  color: #1c1917;
+}
+
+.site-default .default-header {
+  background-color: rgb(250 247 242 / 0.92);
+  border-bottom: 1px solid var(--italy-stone);
+  backdrop-filter: blur(8px);
+}
+
+.site-default .default-logo {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--italy-green);
+}
+
+.site-default .default-nav-link {
+  color: #44403c;
+  transition: color 0.15s ease;
+}
+
+.site-default .default-nav-link:hover {
+  color: var(--italy-terracotta);
+}
+
+.site-default .default-burger-btn {
+  color: var(--italy-green);
+  border: 1px solid var(--italy-stone);
+  background-color: white;
+}
+
+.site-default .default-burger-panel {
+  background-color: var(--italy-cream);
+  border-left: 1px solid var(--italy-stone);
+}
+
+.site-default .default-tricolor span:nth-child(1) {
+  background-color: var(--italy-green);
+}
+
+.site-default .default-tricolor span:nth-child(2) {
+  background-color: #ffffff;
+}
+
+.site-default .default-tricolor span:nth-child(3) {
+  background-color: var(--italy-red);
+}
+
+.site-default .default-footer {
+  background-color: var(--italy-green);
+  color: #f5f5f4;
+}
+
+.site-default .default-footer-accent {
+  color: #d6d3d1;
+}
+
+.site-default .default-main a:not(.no-underline) {
+  color: var(--italy-terracotta);
+}
+
+.site-default .menu-section-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--italy-green);
+  border-color: var(--italy-stone);
+}
+
+.site-default .menu-price {
+  color: var(--italy-terracotta);
+}
+
+.site-default .cms-page h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--italy-green);
+}

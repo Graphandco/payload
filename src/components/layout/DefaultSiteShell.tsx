@@ -1,5 +1,8 @@
+import { DefaultSiteFooter } from '@/components/layout/DefaultSiteFooter'
+import { DefaultSiteHeader } from '@/components/layout/DefaultSiteHeader'
 import type { Site } from '@/payload-types'
 import type { ReactNode } from 'react'
+import '@/styles/default-shell.css'
 
 type Props = {
   site: Site
@@ -8,14 +11,12 @@ type Props = {
 
 export function DefaultSiteShell({ site, children }: Props) {
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b border-neutral-200 px-4 py-4">
-        <strong className="text-lg">{site.name}</strong>
-      </header>
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">{children}</main>
-      <footer className="border-t border-neutral-200 px-4 py-4 text-sm text-neutral-600">
-        © {site.name}
-      </footer>
+    <div className="site-default flex min-h-screen flex-col">
+      <DefaultSiteHeader site={site} />
+      <main className="default-main mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 sm:py-12">
+        {children}
+      </main>
+      <DefaultSiteFooter site={site} />
     </div>
   )
 }

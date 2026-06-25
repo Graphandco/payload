@@ -1,4 +1,5 @@
 import { CmsPageView } from '@/components/cms/CmsPageView'
+import { isMenuPath, MenuPage } from '@/components/menu/MenuPage'
 import { getPageBySiteAndSlug } from '@/lib/getPageBySiteAndSlug'
 import { getSiteByTenant } from '@/lib/getSiteByTenant'
 import { loadCustomHome } from '@/lib/loadCustomHome'
@@ -49,6 +50,10 @@ export default async function TenantPage({ params }: Props) {
   const CustomPage = await loadCustomPage(site.slug, path)
   if (CustomPage) {
     return <CustomPage site={site} />
+  }
+
+  if (isMenuPath(path)) {
+    return <MenuPage site={site} />
   }
 
   const page = await getPageBySiteAndSlug(site.id, path)
