@@ -37,17 +37,227 @@ pnpm dev
 
 ### Routage multi-domaines (dev)
 
-Le middleware intercepte le hostname et réécrit vers `app/(frontend)/[domain]/`.
+Le middleware intercepte le hostname et réécrit vers `app/(frontend)/[domain]/[[...slug]]/`.
 
 | URL | Comportement |
 |-----|--------------|
-| `http://mamma.localhost:3000` | Rewrite → `/mamma` (slug = sous-domaine) |
+| `http://lucelle-app.localhost:3000` | Rewrite → `/lucelle-app` (slug = sous-domaine) |
+| `http://localhost:3000/lucelle-app` | Accès direct sans middleware (même résultat) |
 | `http://localhost:3000/admin` | Admin Payload (bypass middleware) |
 | `http://localhost:3000/api/*` | API Payload (bypass) |
 
 Les navigateurs modernes résolvent `*.localhost` vers `127.0.0.1` sans `/etc/hosts`.
 
 En production, le domaine custom est stocké dans le champ `domain` de la collection `sites`. Le middleware dérive une clé de route sans point (ex. `pizzeria-mamma.fr` → `pizzeria-mamma-fr`).
+
+En dev, le champ `domain` n'est pas utilisé pour le routage : seul le **slug** compte (`{slug}.localhost`). Le domaine sert en prod ou si tu testes via `/etc/hosts` (ex. `lucelle.com`).
+
+### Résolution d'un site (tenant)
+
+Quand une requête arrive sur le front, `getSiteByTenant()` cherche le site par :
+
+1. Le header `x-tenant-domain` (hostname normalisé, ex. `lucelle-app.localhost`)
+2. Le slug dérivé du hostname ou du segment `[domain]` dans l'URL
+
+Le slug Payload doit donc correspondre au sous-domaine dev (`lucelle-app` → `lucelle-app.localhost`).
+
+## Pages du front : CMS vs sur-mesure
+
+Le routing hybride est géré dans `app/(frontend)/[domain]/[[...slug]]/page.tsx`.
+
+```text
+Requête entrante
+       │
+       ▼
+  Site trouvé ? ──non──► 404
+       │
+      oui
+       │
+       ▼
+  Chemin = / ou /accueil ?
+       │
+      oui ──► Page custom (restaurants-custom) ?
+       │              │
+       │             oui ──► Composant React sur-mesure
+       │              │
+       │             non ──► Page CMS slug « accueil » ?
+       │                        │
+       │                       oui ──► CmsPageView (blocs Payload)
+       │                        │
+       │                       non ──► Message « Aucune page d'accueil configurée »
+       │
+      non ──► Page custom (loadCustomPage) ?
+                 │
+                oui ──► Composant React sur-mesure
+                 │
+                non ──► Page CMS avec le slug du chemin (ex. contact)
+                           │
+                          trouvée ──► CmsPageView
+                           │
+                          absente ──► 404
+```
+
+### Pages CMS (éditoriales, par site)
+
+Ce sont les pages gérées dans l'admin Payload, collection **Pages**. Chaque page est **rattachée à un site** (champ `site`) : le contenu est propre à chaque restaurant, mais l'**URL est la même structure** pour tous.
+
+| Concept | Détail |
+|---------|--------|
+| Où les créer | Admin → Pages → Nouvelle page |
+| Champ `site` | Le restaurant concerné (auto-rempli pour les éditeurs) |
+| Champ `slug` | Identifiant d'URL (généré depuis le titre, modifiable) |
+| Champ `layout` | Blocs de contenu (texte, image, galerie, etc.) |
+| Rendu front | `CmsPageView` + `RenderBlocks` |
+
+#### Créer une page « globale » (menu, contact, mentions légales…)
+
+« Globale » signifie ici : **même chemin d'URL pour chaque site** (`/menu`, `/contact`, `/mentions-legales`), avec un **contenu différent par restaurant**.
+
+**Étapes pour chaque site :**
+
+1. Se connecter à l'admin (ou se connecter en tant qu'éditeur du site)
+2. Aller dans **Pages** → **Créer**
+3. Renseigner :
+   - **Site** : `lucelle-app`, `graphandco`, etc.
+   - **Titre** : ex. « Menu », « Contact », « Mentions légales »
+   - **Slug** : `menu`, `contact`, `mentions-legales` (sans slash, en kebab-case)
+4. Composer le contenu dans l'onglet **Contenu** (blocs)
+5. Publier / enregistrer
+
+**URLs résultantes (exemple site `lucelle-app`) :**
+
+| Slug CMS | URL dev | URL prod (si domain = `lucelle.com`) |
+|----------|---------|--------------------------------------|
+| `menu` | `http://lucelle-app.localhost:3000/menu` | `https://lucelle.com/menu` |
+| `contact` | `http://lucelle-app.localhost:3000/contact` | `https://lucelle.com/contact` |
+| `mentions-legales` | `http://lucelle-app.localhost:3000/mentions-legales` | `https://lucelle.com/mentions-legales` |
+| `accueil` | utilisé si pas de page custom | idem |
+
+> **Convention de slugs** : utiliser les mêmes slugs (`menu`, `contact`, `mentions-legales`) sur tous les sites pour garder des URLs homogènes. Le contenu reste éditable indépendamment par site dans l'admin.
+
+> **Accueil sans page custom** : créer une page avec le slug `accueil`. Elle s'affiche sur `/` uniquement si aucune page sur-mesure n'est enregistrée pour ce site (voir ci-dessous).
+
+#### Blocs disponibles
+
+| Bloc | Usage |
+|------|-------|
+| `simpleText` | Paragraphe court |
+| `simpleParagraph` | Paragraphe |
+| `formattedText` | Texte riche (Lexical) |
+| `image` | Image unique |
+| `gallery` | Galerie d'images |
+| `conditionalRepeater` | Liste de champs texte / textarea |
+
+Le rendu est dans `src/components/cms/RenderBlocks.tsx`. Pour un nouveau type de bloc, l'ajouter dans `src/blocks/` puis dans la collection `Pages` et dans `RenderBlocks`.
+
+---
+
+### Pages sur-mesure (React, design custom)
+
+Pour une expérience 100 % code (layout, animations, composants spécifiques), on place des composants React dans `src/restaurants-custom/{slug}/`.
+
+Le **slug du dossier = le slug Payload du site** (ex. `lucelle-app`, pas `lucelle`).
+
+```text
+src/restaurants-custom/
+└── lucelle-app/
+    └── page.tsx          # Accueil custom (déjà branché)
+```
+
+#### Accueil sur-mesure (ex. `lucelle-app`)
+
+**1. Créer le composant**
+
+```tsx
+// src/restaurants-custom/lucelle-app/page.tsx
+import type { Site } from '@/payload-types'
+
+type Props = {
+  site: Site
+}
+
+export default function LucelleHomePage({ site }: Props) {
+  return (
+    <main>
+      <h1>{site.name}</h1>
+      {/* design libre : sections, composants, fetch API… */}
+    </main>
+  )
+}
+```
+
+Le composant reçoit `site` (nom, slug, domain, id…) pour personnaliser l'affichage.
+
+**2. Enregistrer le loader**
+
+Dans `src/lib/loadCustomHome.ts`, ajouter une entrée dont la **clé = slug Payload** :
+
+```ts
+const customHomeLoaders: Record<string, () => Promise<{ default: CustomHomePage }>> = {
+  'lucelle-app': () => import('@/restaurants-custom/lucelle-app/page'),
+  // 'graphandco': () => import('@/restaurants-custom/graphandco/page'),
+}
+```
+
+**3. Tester**
+
+- `http://lucelle-app.localhost:3000/` → page custom
+- Les autres chemins (`/contact`…) passent par le CMS, sauf pages custom enregistrées (voir ci-dessous)
+
+Priorité à l'accueil : **custom** → CMS `accueil` → message par défaut.
+
+#### Autre page sur-mesure (ex. `/carte`, `/presentation`)
+
+Pour une page interne en React (hors accueil), utiliser `loadCustomPage.ts` — branché dans `[[...slug]]/page.tsx` **avant** la recherche CMS.
+
+**Exemple en place : `/carte` pour `lucelle-app`**
+
+**1. Créer le composant**
+
+```text
+src/restaurants-custom/lucelle-app/carte/page.tsx
+```
+
+**2. Enregistrer dans `loadCustomPage.ts`**
+
+```ts
+const customPageLoaders: Record<string, Record<string, CustomPageLoader>> = {
+  'lucelle-app': {
+    carte: () => import('@/restaurants-custom/lucelle-app/carte/page'),
+  },
+}
+```
+
+**3. Tester**
+
+- `http://lucelle-app.localhost:3000/carte` → page custom
+- Si aucune page custom pour ce chemin → fallback CMS (slug `carte`) → sinon 404
+
+| Option | Quand l'utiliser |
+|--------|------------------|
+| **Page CMS** | Contenu éditorial, blocs standards |
+| **`loadCustomPage`** | Design ou logique spécifique (ex. carte interactive avant branchement produits Payload) |
+
+Priorité pour les chemins non-accueil : **custom** (`loadCustomPage`) → **CMS** → 404.
+
+```text
+src/restaurants-custom/
+├── lucelle-app/
+│   ├── page.tsx              # Accueil → loadCustomHome
+│   └── carte/
+│       └── page.tsx          # /carte → loadCustomPage
+└── graphandco/
+    └── presentation/
+        └── page.tsx          # /presentation → loadCustomPage (à ajouter)
+```
+
+#### Checklist : nouveau restaurant avec accueil custom
+
+- [ ] Site créé dans Payload (`slug` unique, ex. `mon-restaurant`)
+- [ ] Dossier `src/restaurants-custom/mon-restaurant/page.tsx`
+- [ ] Entrée `'mon-restaurant'` dans `loadCustomHome.ts`
+- [ ] Pages CMS créées pour ce site (`menu`, `contact`, etc.)
+- [ ] Test dev : `http://mon-restaurant.localhost:3000`
 
 ### Sites (collection)
 
@@ -67,16 +277,26 @@ En production, le domaine custom est stocké dans le champ `domain` de la collec
 ```text
 src/
 ├── app/
-│   ├── (payload)/          # Admin + API Payload
-│   └── (frontend)/         # Front multi-sites
-│       └── [domain]/       # Page tenant (rewrite middleware)
-├── collections/            # Sites, Users, Pages, Products, etc.
-├── components/admin/       # Composants custom admin Payload
+│   ├── (payload)/              # Admin + API Payload
+│   └── (frontend)/             # Front multi-sites
+│       └── [domain]/
+│           └── [[...slug]]/    # Routing hybride (CMS + custom)
+├── collections/                # Sites, Users, Pages, Products, etc.
+├── components/
+│   ├── admin/                  # Composants custom admin Payload
+│   └── cms/                    # CmsPageView, RenderBlocks
+├── restaurants-custom/         # Pages React sur-mesure par site
+│   └── {slug}/
+│       └── page.tsx            # Accueil custom
 ├── lib/
-│   ├── siteAccess.ts       # Accès scopé par site
-│   └── siteDomain.ts       # Helpers domaine (dev/prod)
-├── migrations/             # Migrations Postgres (prod)
-└── middleware.ts           # Routage par hostname
+│   ├── siteAccess.ts           # Accès scopé par site
+│   ├── siteDomain.ts           # Helpers domaine (dev/prod)
+│   ├── getSiteByTenant.ts      # Résolution du site depuis le hostname
+│   ├── getPageBySiteAndSlug.ts # Récupération page CMS
+│   ├── loadCustomHome.ts       # Registry des accueils custom
+│   └── loadCustomPage.ts       # Registry des pages custom (carte, etc.)
+├── migrations/                 # Migrations Postgres (prod)
+└── middleware.ts               # Routage par hostname
 ```
 
 ## Scripts

@@ -305,6 +305,33 @@ export const createSitesAdminAccess = (): (({ req }: { req: any }) => boolean | 
   }
 }
 
+export const createPublicSiteScopedCollectionAccess = (collection: string, siteField = 'site') => {
+  const publicRead: Access = async ({ req }) => {
+    if (!req.user) {
+      return true
+    }
+
+    if (await userIsAdmin(req)) {
+      return true
+    }
+
+    const siteIDs = await getUserSiteIDsFromReq(req)
+    if (siteIDs.length === 0) {
+      return false
+    }
+
+    return buildSiteScopedConstraint(siteIDs, siteField)
+  }
+
+  return {
+    read: publicRead,
+    create: createHideWhenEmptyCreateAccess(collection, siteField),
+    update: createSiteScopedManageAccess(siteField),
+    delete: createSiteScopedManageAccess(siteField),
+    admin: createHideWhenEmptyAdminAccess(collection, siteField),
+  }
+}
+
 export const createSiteScopedCollectionAccess = (collection: string, siteField = 'site') => {
   const baseRead = createSiteScopedReadAccess(siteField)
 

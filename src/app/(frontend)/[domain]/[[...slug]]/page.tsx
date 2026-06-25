@@ -1,0 +1,60 @@
+import { CmsPageView } from '@/components/cms/CmsPageView'
+import { getPageBySiteAndSlug } from '@/lib/getPageBySiteAndSlug'
+import { getSiteByTenant } from '@/lib/getSiteByTenant'
+import { loadCustomHome } from '@/lib/loadCustomHome'
+import { loadCustomPage } from '@/lib/loadCustomPage'
+import { notFound } from 'next/navigation'
+
+type Props = {
+  params: Promise<{ domain: string; slug?: string[] }>
+}
+
+function resolvePagePath(slug?: string[]): string {
+  return slug?.join('/') ?? ''
+}
+
+function isHomePath(path: string): boolean {
+  return path === '' || path === 'accueil'
+}
+
+export default async function TenantPage({ params }: Props) {
+  const { domain: tenantKey, slug } = await params
+  const site = await getSiteByTenant(tenantKey)
+
+  if (!site) {
+    notFound()
+  }
+
+  const path = resolvePagePath(slug)
+
+  if (isHomePath(path)) {
+    const CustomHome = await loadCustomHome(site.slug)
+    if (CustomHome) {
+      return <CustomHome site={site} />
+    }
+
+    const homePage = await getPageBySiteAndSlug(site.id, 'accueil')
+    if (homePage) {
+      return <CmsPageView page={homePage} site={site} />
+    }
+
+    return (
+      <>
+        <h1>{site.name}</h1>
+        <p>Aucune page d&apos;accueil configurée.</p>
+      </>
+    )
+  }
+
+  const CustomPage = await loadCustomPage(site.slug, path)
+  if (CustomPage) {
+    return <CustomPage site={site} />
+  }
+
+  const page = await getPageBySiteAndSlug(site.id, path)
+  if (!page) {
+    notFound()
+  }
+
+  return <CmsPageView page={page} site={site} />
+}

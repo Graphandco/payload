@@ -10,11 +10,11 @@ import {
 import {
   createAssignDefaultSiteBeforeChange,
   createSiteField,
-  createSiteScopedCollectionAccess,
+  createPublicSiteScopedCollectionAccess,
 } from '../lib/siteAccess'
 import { createSlugFromField } from '../lib/slug'
 
-const siteAccess = createSiteScopedCollectionAccess('pages')
+const siteAccess = createPublicSiteScopedCollectionAccess('pages')
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
