@@ -11,6 +11,7 @@ type SiteShellLoader = () => Promise<{ default: SiteShell }>
 
 const siteShellLoaders: Record<string, SiteShellLoader> = {
   'lucelle-app': () => import('@/restaurants-custom/lucelle-app/layout'),
+  graphandco: () => import('@/restaurants-custom/graphandco/layout'),
 }
 
 export async function loadSiteShell(siteSlug: string): Promise<SiteShell | null> {

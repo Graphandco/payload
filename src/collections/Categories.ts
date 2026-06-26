@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import {
   createAssignDefaultSiteBeforeChange,
   createSiteField,
@@ -30,10 +31,15 @@ export const Categories: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      admin: {
+        hidden: true,
+      },
     },
     {
       name: 'description',
-      type: 'textarea',
+      label: 'Description',
+      type: 'richText',
+      editor: lexicalEditor(),
     },
   ],
   hooks: {

@@ -41,8 +41,13 @@ export function MenuProductRow({ siteId, product }: Props) {
         />
       ) : null}
       <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 items-center justify-between gap-4">
-          <span className="font-medium">{product.name}</span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="min-w-0">
+            <span className="font-medium">{product.name}</span>
+            {product.description ? (
+              <p className="mt-0.5 text-sm text-muted-foreground">{product.description}</p>
+            ) : null}
+          </div>
           <strong className="menu-price shrink-0">{formatPrice(product.price)}</strong>
         </div>
         <Button

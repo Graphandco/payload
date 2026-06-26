@@ -1,0 +1,145 @@
+.site-graphandco {
+  --graphandco-primary: #0d7a5b;
+  --graphandco-text: #012a24;
+  --graphandco-secondary: #97f8e4;
+  --graphandco-accent-start: #e65d26;
+  --graphandco-accent-end: #f9972a;
+  --graphandco-muted: #4a6b66;
+  --graphandco-border: #c5e8df;
+  --graphandco-surface: #f4fdfa;
+
+  --background: var(--graphandco-surface);
+  --foreground: var(--graphandco-text);
+  --card: #ffffff;
+  --card-foreground: var(--graphandco-text);
+  --popover: #ffffff;
+  --popover-foreground: var(--graphandco-text);
+  --primary: var(--graphandco-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--graphandco-secondary);
+  --secondary-foreground: var(--graphandco-text);
+  --muted: #e8f7f2;
+  --muted-foreground: var(--graphandco-muted);
+  --accent: var(--graphandco-secondary);
+  --accent-foreground: var(--graphandco-text);
+  --destructive: #c0392b;
+  --border: var(--graphandco-border);
+  --input: var(--graphandco-border);
+  --ring: var(--graphandco-primary);
+  --radius: 0.5rem;
+
+  background-color: var(--graphandco-surface);
+  color: var(--graphandco-text);
+}
+
+/* Shell partagé (header, footer, carte, panier) */
+.site-graphandco .default-header {
+  background-color: rgb(244 253 250 / 0.92);
+  border-bottom: 1px solid var(--graphandco-border);
+  backdrop-filter: blur(8px);
+}
+
+.site-graphandco .default-logo {
+  color: var(--graphandco-primary);
+  font-weight: 600;
+}
+
+.site-graphandco .default-nav-link {
+  color: var(--graphandco-text);
+  transition: color 0.15s ease;
+}
+
+.site-graphandco .default-nav-link:hover {
+  color: var(--graphandco-accent-start);
+}
+
+.site-graphandco .default-burger-btn {
+  color: var(--graphandco-primary);
+  border: 1px solid var(--graphandco-border);
+  background-color: white;
+}
+
+.site-graphandco .default-burger-panel {
+  background-color: var(--graphandco-surface);
+  border-left: 1px solid var(--graphandco-border);
+}
+
+.site-graphandco .default-footer {
+  background-color: var(--graphandco-primary);
+  color: #f4fdfa;
+  font-family: inherit;
+}
+
+.site-graphandco .default-footer-accent {
+  color: #c5e8df;
+}
+
+.site-graphandco .default-main a:not(.no-underline) {
+  color: var(--graphandco-primary);
+}
+
+.site-graphandco .menu-section-title {
+  color: var(--graphandco-primary);
+  border-color: var(--graphandco-border);
+}
+
+.site-graphandco .menu-price {
+  color: var(--graphandco-accent-start);
+}
+
+.site-graphandco .cart-badge-count {
+  background: linear-gradient(135deg, var(--graphandco-accent-start), var(--graphandco-accent-end));
+  color: white;
+}
+
+.site-graphandco .cart-link {
+  color: var(--graphandco-primary);
+}
+
+.site-graphandco .cart-line {
+  border-color: var(--graphandco-border);
+}
+
+/* Boutons CTA — dégradé accent */
+.site-graphandco .graphandco-btn-primary,
+.site-graphandco .bg-primary {
+  border: none;
+  background-image: linear-gradient(
+    135deg,
+    var(--graphandco-accent-start) 0%,
+    var(--graphandco-accent-end) 100%
+  );
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.site-graphandco .graphandco-btn-primary:hover,
+.site-graphandco .bg-primary:hover {
+  background-image: linear-gradient(
+    135deg,
+    var(--graphandco-accent-start) 0%,
+    var(--graphandco-accent-end) 100%
+  );
+  opacity: 0.92;
+}
+
+.site-graphandco .graphandco-btn-outline {
+  border-color: var(--graphandco-primary);
+  color: var(--graphandco-primary);
+  background-color: transparent;
+}
+
+.site-graphandco .graphandco-btn-outline:hover {
+  background-color: rgb(13 122 91 / 0.08);
+  color: var(--graphandco-primary);
+}
+
+/* Bandeau démo */
+.site-graphandco .graphandco-demo {
+  background-color: var(--graphandco-primary);
+  color: #f4fdfa;
+}
+
+.site-graphandco .graphandco-demo a {
+  color: inherit;
+}

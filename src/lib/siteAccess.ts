@@ -155,6 +155,15 @@ export const createSiteField = (): RelationshipField => ({
 export const createAssignDefaultSiteBeforeChange =
   (): CollectionBeforeChangeHook =>
   async ({ req, data }) => {
+    const siteId =
+      typeof data?.site === 'object' && data.site !== null
+        ? (data.site as { id?: number | string }).id
+        : data?.site
+
+    if (siteId) {
+      return data
+    }
+
     if (await userIsAdmin(req)) {
       return data
     }

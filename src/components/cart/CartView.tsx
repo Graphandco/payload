@@ -9,6 +9,7 @@ import { formatPrice } from '@/lib/formatPrice'
 import { useCartLines, useCartStore, useCartTotal } from '@/stores/cartStore'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { CircleMinus } from 'lucide-react'
 
 type Props = {
   siteId: number
@@ -58,7 +59,10 @@ export function CartView({ siteId }: Props) {
 
       <ul className="list-none space-y-0 p-0">
         {lines.map((line) => (
-          <li key={line.productId} className="cart-line flex flex-wrap items-center justify-between gap-4 border-b py-4">
+          <li
+            key={line.productId}
+            className="cart-line flex flex-wrap items-center justify-between gap-4 border-b py-4"
+          >
             <div className="min-w-0 flex-1">
               <p className="font-medium">{line.name}</p>
               <p className="text-sm text-neutral-600">{formatPrice(line.price)} / unité</p>
@@ -86,7 +90,9 @@ export function CartView({ siteId }: Props) {
                   +
                 </Button>
               </div>
-              <strong className="menu-price min-w-20 text-right">{formatPrice(line.price * line.quantity)}</strong>
+              <strong className="menu-price min-w-20 text-right">
+                {formatPrice(line.price * line.quantity)}
+              </strong>
               <Button
                 type="button"
                 variant="link"
@@ -94,7 +100,7 @@ export function CartView({ siteId }: Props) {
                 className="text-muted-foreground"
                 onClick={() => removeItem(siteId, line.productId)}
               >
-                Retirer
+                <CircleMinus className="size-4 text-destructive" />
               </Button>
             </div>
           </li>

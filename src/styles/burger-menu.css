@@ -1,0 +1,28 @@
+/* Panneau porté sur body — couleurs injectées via --burger-panel-* (BurgerMenu) */
+.default-burger-panel {
+  background-color: var(--burger-panel-bg, #faf7f2);
+  border-left: 1px solid var(--burger-panel-border, #e8e2d9);
+}
+
+/* Header + bouton toggle au-dessus du panneau (z-50 sur body) */
+body.burger-menu-open .default-header {
+  position: relative;
+  z-index: 60;
+}
+
+body.burger-menu-open .burger-menu-toggle {
+  position: relative;
+  z-index: 70;
+}
+
+/* Panneau calé sur le viewport, pas sur le header (backdrop-filter) */
+.burger-menu-panel {
+  top: 0;
+  bottom: 0;
+  height: 100dvh;
+  max-height: 100dvh;
+}
+
+.burger-menu-overlay {
+  touch-action: none;
+}

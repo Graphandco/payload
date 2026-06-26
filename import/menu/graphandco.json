@@ -1,0 +1,213 @@
+{
+  "siteSlug": "graphandco",
+  "categories": [
+    {
+      "slug": "graphandco-entrees",
+      "name": "Entrées",
+      "description": "Pour commencer : antipasti, bruschette et salades maison.\n\nProduits frais et de saison."
+    },
+    {
+      "slug": "graphandco-pates",
+      "name": "Pâtes",
+      "description": "Pâtes fraîches et sauces traditionnelles, préparées à la commande."
+    },
+    {
+      "slug": "graphandco-pizzas",
+      "name": "Pizzas",
+      "description": "Pâte longue fermentation, cuite au feu de bois.\n\nBase tomate ou crème, mozzarella fior di latte."
+    },
+    {
+      "slug": "graphandco-viandes",
+      "name": "Viandes",
+      "description": "Secondi piatti et grillades, accompagnés de légumes de saison."
+    },
+    {
+      "slug": "graphandco-desserts",
+      "name": "Desserts",
+      "description": "Douceurs italiennes faites maison."
+    }
+  ],
+  "products": [
+    {
+      "slug": "graphandco-bruschetta-pomodoro",
+      "name": "Bruschetta al pomodoro",
+      "description": "Pain grillé, tomates fraîches, ail et basilic",
+      "price": 6.5,
+      "category": "graphandco-entrees"
+    },
+    {
+      "slug": "graphandco-burrata",
+      "name": "Burrata, tomates cerises et basilic",
+      "description": "Burrata crémeuse, huile d'olive extra vierge",
+      "price": 9.9,
+      "category": "graphandco-entrees"
+    },
+    {
+      "slug": "graphandco-carpaccio",
+      "name": "Carpaccio de bœuf, roquette et parmesan",
+      "price": 11.5,
+      "category": "graphandco-entrees"
+    },
+    {
+      "slug": "graphandco-antipasto",
+      "name": "Antipasto della casa",
+      "description": "Sélection de charcuteries et légumes marinés",
+      "price": 13.9,
+      "category": "graphandco-entrees"
+    },
+    {
+      "slug": "graphandco-caprese",
+      "name": "Salade caprese",
+      "description": "Mozzarella, tomates, basilic",
+      "price": 8.5,
+      "category": "graphandco-entrees"
+    },
+    {
+      "slug": "graphandco-arancini",
+      "name": "Arancini au ragù",
+      "price": 7.9,
+      "category": "graphandco-entrees"
+    },
+    {
+      "slug": "graphandco-carbonara",
+      "name": "Spaghetti alla carbonara",
+      "description": "Guanciale, pecorino, jaune d'œuf",
+      "price": 14.5,
+      "category": "graphandco-pates"
+    },
+    {
+      "slug": "graphandco-bolognese",
+      "name": "Tagliatelles au ragù bolognese",
+      "price": 15.9,
+      "category": "graphandco-pates"
+    },
+    {
+      "slug": "graphandco-arrabbiata",
+      "name": "Penne all'arrabbiata",
+      "description": "Sauce tomate piquante",
+      "price": 13.5,
+      "category": "graphandco-pates"
+    },
+    {
+      "slug": "graphandco-lasagne",
+      "name": "Lasagne della nonna",
+      "price": 16.5,
+      "category": "graphandco-pates"
+    },
+    {
+      "slug": "graphandco-ravioli",
+      "name": "Ravioli ricotta et épinards, beurre de sauge",
+      "price": 17.9,
+      "category": "graphandco-pates"
+    },
+    {
+      "slug": "graphandco-linguine-fruits-de-mer",
+      "name": "Linguine aux fruits de mer",
+      "price": 18.5,
+      "category": "graphandco-pates"
+    },
+    {
+      "slug": "graphandco-margherita",
+      "name": "Margherita",
+      "description": "Tomate, mozzarella, basilic",
+      "price": 11.9,
+      "category": "graphandco-pizzas"
+    },
+    {
+      "slug": "graphandco-regina",
+      "name": "Regina",
+      "description": "Tomate, mozzarella, jambon, champignons",
+      "price": 13.5,
+      "category": "graphandco-pizzas"
+    },
+    {
+      "slug": "graphandco-diavola",
+      "name": "Diavola",
+      "description": "Tomate, mozzarella, salami piquant",
+      "price": 13.9,
+      "category": "graphandco-pizzas"
+    },
+    {
+      "slug": "graphandco-quattro-formaggi",
+      "name": "Quattro formaggi",
+      "price": 14.5,
+      "category": "graphandco-pizzas"
+    },
+    {
+      "slug": "graphandco-calzone",
+      "name": "Calzone ricotta et jambon cru",
+      "price": 14.9,
+      "category": "graphandco-pizzas"
+    },
+    {
+      "slug": "graphandco-vegetarienne",
+      "name": "Végétarienne",
+      "description": "Légumes grillés, mozzarella",
+      "price": 13.5,
+      "category": "graphandco-pizzas"
+    },
+    {
+      "slug": "graphandco-scaloppine",
+      "name": "Scaloppine au citron",
+      "price": 19.5,
+      "category": "graphandco-viandes"
+    },
+    {
+      "slug": "graphandco-osso-buco",
+      "name": "Osso buco milanaise",
+      "description": "Jarret de veau braisé, gremolata",
+      "price": 22.9,
+      "category": "graphandco-viandes"
+    },
+    {
+      "slug": "graphandco-saltimbocca",
+      "name": "Saltimbocca alla romana",
+      "price": 21.5,
+      "category": "graphandco-viandes"
+    },
+    {
+      "slug": "graphandco-cote-veau",
+      "name": "Côte de veau grillée",
+      "price": 24.9,
+      "category": "graphandco-viandes"
+    },
+    {
+      "slug": "graphandco-pollo-cacciatora",
+      "name": "Pollo alla cacciatora",
+      "description": "Poulet mijoté aux olives et tomates",
+      "price": 18.9,
+      "category": "graphandco-viandes"
+    },
+    {
+      "slug": "graphandco-tiramisu",
+      "name": "Tiramisu",
+      "price": 7.5,
+      "category": "graphandco-desserts"
+    },
+    {
+      "slug": "graphandco-panna-cotta",
+      "name": "Panna cotta vanille",
+      "price": 6.9,
+      "category": "graphandco-desserts"
+    },
+    {
+      "slug": "graphandco-cannoli",
+      "name": "Cannoli siciliani",
+      "price": 7.9,
+      "category": "graphandco-desserts"
+    },
+    {
+      "slug": "graphandco-gelato",
+      "name": "Gelato (2 boules)",
+      "description": "Parfums au choix selon arrivage",
+      "price": 5.5,
+      "category": "graphandco-desserts"
+    },
+    {
+      "slug": "graphandco-affogato",
+      "name": "Affogato al caffè",
+      "price": 6.5,
+      "category": "graphandco-desserts"
+    }
+  ]
+}

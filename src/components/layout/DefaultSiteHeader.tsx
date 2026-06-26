@@ -13,11 +13,6 @@ type Props = {
 export function DefaultSiteHeader({ site }: Props) {
   return (
     <header className="default-header sticky top-0 z-30">
-      <div className="default-tricolor flex h-1">
-        <span className="flex-1" />
-        <span className="flex-1" />
-        <span className="flex-1" />
-      </div>
       <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6">
         <BurgerMenu
           siteName={site.name}

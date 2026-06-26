@@ -226,7 +226,21 @@ export interface Category {
   site?: (number | null) | Site;
   name: string;
   slug: string;
-  description?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -240,6 +254,10 @@ export interface Product {
   name: string;
   slug: string;
   price: number;
+  /**
+   * Ingrédients ou précisions affichées sur la carte.
+   */
+  description?: string | null;
   /**
    * Catégories réutilisables (produits, blog, etc.).
    */
@@ -479,6 +497,7 @@ export interface ProductsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   price?: T;
+  description?: T;
   categories?: T;
   featuredImage?: T;
   updatedAt?: T;

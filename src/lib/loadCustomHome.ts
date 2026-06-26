@@ -9,6 +9,7 @@ type CustomHomePage = ComponentType<{ site: Site }>
 
 const customHomeLoaders: Record<string, () => Promise<{ default: CustomHomePage }>> = {
   'lucelle-app': () => import('@/restaurants-custom/lucelle-app/page'),
+  graphandco: () => import('@/restaurants-custom/graphandco/page'),
 }
 
 export async function loadCustomHome(siteSlug: string): Promise<CustomHomePage | null> {

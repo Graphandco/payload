@@ -33,6 +33,9 @@ export const Products: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      admin: {
+        hidden: true,
+      },
     },
     {
       name: 'price',
@@ -42,6 +45,14 @@ export const Products: CollectionConfig = {
       min: 0,
       admin: {
         step: 0.01,
+      },
+    },
+    {
+      name: 'description',
+      label: 'Description',
+      type: 'textarea',
+      admin: {
+        description: 'Ingrédients ou précisions affichées sur la carte.',
       },
     },
     {

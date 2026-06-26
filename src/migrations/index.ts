@@ -1,6 +1,7 @@
-import * as migration_20260624_000000_baseline from './20260624_000000_baseline'
-import * as migration_20260624_000001_add_site_domain from './20260624_000001_add_site_domain'
-import * as migration_20260624_000002_cleanup_products_drop_weights from './20260624_000002_cleanup_products_drop_weights'
+import * as migration_20260624_000000_baseline from './20260624_000000_baseline';
+import * as migration_20260624_000001_add_site_domain from './20260624_000001_add_site_domain';
+import * as migration_20260624_000002_cleanup_products_drop_weights from './20260624_000002_cleanup_products_drop_weights';
+import * as migration_20260626_124619 from './20260626_124619';
 
 export const migrations = [
   {
@@ -18,4 +19,9 @@ export const migrations = [
     down: migration_20260624_000002_cleanup_products_drop_weights.down,
     name: '20260624_000002_cleanup_products_drop_weights',
   },
-]
+  {
+    up: migration_20260626_124619.up,
+    down: migration_20260626_124619.down,
+    name: '20260626_124619'
+  },
+];
