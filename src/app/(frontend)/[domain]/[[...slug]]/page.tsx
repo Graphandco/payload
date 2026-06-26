@@ -5,6 +5,7 @@
  */
 import { CmsPageView } from '@/components/cms/CmsPageView'
 import { CartPage, isCartPath } from '@/components/cart/CartPage'
+import { CheckoutPage, isCheckoutPath } from '@/components/checkout/CheckoutPage'
 import { ContactPage, isContactPath } from '@/components/contact/ContactPage'
 import { isMenuPath, MenuPage } from '@/components/menu/MenuPage'
 import { getPageBySiteAndSlug } from '@/lib/getPageBySiteAndSlug'
@@ -69,6 +70,10 @@ export default async function TenantPage({ params }: Props) {
 
   if (isContactPath(path)) {
     return <ContactPage site={site} />
+  }
+
+  if (isCheckoutPath(path)) {
+    return <CheckoutPage site={site} />
   }
 
   const page = await getPageBySiteAndSlug(site.id, path)

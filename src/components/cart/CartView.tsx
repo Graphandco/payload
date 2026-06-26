@@ -141,13 +141,14 @@ export function CartView({ site }: Props) {
         <p className="text-xl font-semibold menu-price">{formatPrice(total)}</p>
       </div>
 
-      <p className="text-sm text-neutral-600">
-        Le paiement en ligne sera disponible prochainement.
-      </p>
-
-      <Link href="/carte" className="cart-link inline-block font-medium no-underline">
-        Continuer mes achats
-      </Link>
+      <div className="flex flex-wrap items-center gap-4">
+        <Link href="/commande">
+          <Button type="button">Commander</Button>
+        </Link>
+        <Link href="/carte" className="cart-link inline-block font-medium no-underline">
+          Continuer mes achats
+        </Link>
+      </div>
     </div>
   )
 }
