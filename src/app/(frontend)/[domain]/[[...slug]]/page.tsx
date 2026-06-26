@@ -1,12 +1,13 @@
 /**
  * Routeur principal du front multi-tenant.
  * Résout chaque URL ({slug}.localhost/chemin) vers : accueil custom, page CMS,
- * page React custom, routes métier partagées (/carte, /panier) ou 404.
+ * page React custom, routes métier partagées (/carte, /panier, /cuisine) ou 404.
  */
 import { CmsPageView } from '@/components/cms/CmsPageView'
 import { CartPage, isCartPath } from '@/components/cart/CartPage'
 import { CheckoutPage, isCheckoutPath } from '@/components/checkout/CheckoutPage'
 import { ContactPage, isContactPath } from '@/components/contact/ContactPage'
+import { KitchenPage, isKitchenPath } from '@/components/kitchen/KitchenPage'
 import { isMenuPath, MenuPage } from '@/components/menu/MenuPage'
 import { getPageBySiteAndSlug } from '@/lib/getPageBySiteAndSlug'
 import { getSiteByTenant } from '@/lib/getSiteByTenant'
@@ -74,6 +75,10 @@ export default async function TenantPage({ params }: Props) {
 
   if (isCheckoutPath(path)) {
     return <CheckoutPage site={site} />
+  }
+
+  if (isKitchenPath(path)) {
+    return <KitchenPage site={site} />
   }
 
   const page = await getPageBySiteAndSlug(site.id, path)
