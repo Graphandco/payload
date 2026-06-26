@@ -11,7 +11,7 @@ type Props = {
 
 export default function GraphandcoHero({ site }: Props) {
   return (
-    <section className="border-b border-border bg-linear-to-br from-background via-[#e8faf4] to-secondary/35 px-4 pt-8 sm:px-6 sm:pt-12">
+    <section className="border-b border-border bg-linear-to-br from-background via-[#e8faf4] to-secondary/35 px-4 pt-8 sm:pt-12">
       <div className="mx-auto max-w-5xl">
         <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-[3fr_2fr]">
           <div className="pb-8 sm:pb-12">

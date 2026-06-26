@@ -6,6 +6,7 @@
 
 import { MenuProductRow } from '@/components/menu/MenuProductRow'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useHeaderHeight } from '@/hooks/useHeaderHeight'
 import type { MenuSection } from '@/lib/groupProductsByCategory'
 import { cn } from '@/lib/utils'
 import type { Category, Site } from '@/payload-types'
@@ -49,22 +50,23 @@ function CategoryDescription({ description }: { description: Category['descripti
 
 export function MenuView({ site, sections }: Props) {
   const isDesktop = useIsDesktop()
+  const stickyTop = useHeaderHeight(10)
   const defaultTab = sections.length > 0 ? getSectionId(sections[0]) : ''
   const [activeTab, setActiveTab] = useState(defaultTab)
 
   if (sections.length === 0) {
     return (
-      <div className="mx-auto max-w-5xl space-y-2 py-8 sm:py-12">
+      <div className="mx-auto max-w-5xl px-4 space-y-2 py-8 sm:py-12">
         <p className="text-sm text-neutral-600">{site.name}</p>
-        <h1 className="text-3xl font-semibold tracking-tight">La carte</h1>
+        <h1 className="text-4xl font-semibold tracking-tight">La carte</h1>
         <p className="text-neutral-600">Aucun produit n&apos;est disponible pour le moment.</p>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-5xl py-8 sm:py-12">
-      <h1 className="text-3xl font-semibold tracking-tight">La carte</h1>
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+      <h1 className="text-4xl font-semibold tracking-tight">La carte</h1>
 
       <Tabs
         value={activeTab}
@@ -74,15 +76,20 @@ export function MenuView({ site, sections }: Props) {
       >
         <TabsList
           variant="line"
+          style={stickyTop > 0 ? { top: stickyTop } : undefined}
           className={cn(
-            'sticky z-10 shrink-0',
+            'sticky top-16 z-10 shrink-0',
             isDesktop
-              ? 'top-20 w-36 self-start sm:top-24 sm:w-40 lg:w-48'
-              : 'top-16 -mx-4 flex w-auto max-w-[100vw] overflow-x-auto border-b border-border bg-background/95 px-4 backdrop-blur-sm sm:top-20 **:data-[slot=tabs-trigger]:shrink-0',
+              ? 'w-36 self-start sm:w-40 lg:w-48'
+              : '-mx-4 flex w-auto max-w-[100vw] overflow-x-auto border-b border-border bg-background/95 px-4 backdrop-blur-sm **:data-[slot=tabs-trigger]:shrink-0',
           )}
         >
           {sections.map((section) => (
-            <TabsTrigger key={getSectionId(section)} value={getSectionId(section)}>
+            <TabsTrigger
+              key={getSectionId(section)}
+              value={getSectionId(section)}
+              className="leading-loose text-primary"
+            >
               {section.category?.name ?? 'Autres'}
             </TabsTrigger>
           ))}
@@ -95,7 +102,7 @@ export function MenuView({ site, sections }: Props) {
             return (
               <TabsContent key={getSectionId(section)} value={getSectionId(section)}>
                 <section>
-                  <h2 className="menu-section-title">{title}</h2>
+                  <h2 className="menu-section-title text-2xl font-semibold">{title}</h2>
                   <CategoryDescription description={section.category?.description} />
                   <ul className="mt-4 list-none p-0">
                     {section.products.map((product) => (
