@@ -314,6 +314,29 @@ export const createSitesAdminAccess = (): (({ req }: { req: any }) => boolean | 
   }
 }
 
+export const createSitesUpdateAccess = (): Access => {
+  return async ({ req }) => {
+    if (!req.user) {
+      return false
+    }
+
+    if (await userIsAdmin(req)) {
+      return true
+    }
+
+    const siteIDs = await getUserSiteIDsFromReq(req)
+    if (siteIDs.length === 0) {
+      return false
+    }
+
+    return {
+      id: {
+        in: siteIDs,
+      },
+    }
+  }
+}
+
 export const createPublicSiteScopedCollectionAccess = (collection: string, siteField = 'site') => {
   const publicRead: Access = async ({ req }) => {
     if (!req.user) {

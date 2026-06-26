@@ -93,6 +93,208 @@ export interface Site {
    * Domaine custom en production (ex. pizzeria-mamma.fr). Optionnel en dev : si vide, {slug}.localhost est utilisé.
    */
   domain?: string | null;
+  contact?: {
+    email?: string | null;
+    phone?: string | null;
+    street?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+  };
+  schedule?: {
+    /**
+     * Un bloc par jour. Cochez « Fermé » pour fermer le lundi (ou tout autre jour) sans créneau.
+     */
+    weeklyHours?: {
+      monday?: {
+        closed?: boolean | null;
+        /**
+         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         */
+        slots?:
+          | {
+              /**
+               * Format 24h (ex. 11:30).
+               */
+              open: string;
+              /**
+               * Format 24h (ex. 14:00).
+               */
+              close: string;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      tuesday?: {
+        closed?: boolean | null;
+        /**
+         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         */
+        slots?:
+          | {
+              /**
+               * Format 24h (ex. 11:30).
+               */
+              open: string;
+              /**
+               * Format 24h (ex. 14:00).
+               */
+              close: string;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      wednesday?: {
+        closed?: boolean | null;
+        /**
+         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         */
+        slots?:
+          | {
+              /**
+               * Format 24h (ex. 11:30).
+               */
+              open: string;
+              /**
+               * Format 24h (ex. 14:00).
+               */
+              close: string;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      thursday?: {
+        closed?: boolean | null;
+        /**
+         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         */
+        slots?:
+          | {
+              /**
+               * Format 24h (ex. 11:30).
+               */
+              open: string;
+              /**
+               * Format 24h (ex. 14:00).
+               */
+              close: string;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      friday?: {
+        closed?: boolean | null;
+        /**
+         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         */
+        slots?:
+          | {
+              /**
+               * Format 24h (ex. 11:30).
+               */
+              open: string;
+              /**
+               * Format 24h (ex. 14:00).
+               */
+              close: string;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      saturday?: {
+        closed?: boolean | null;
+        /**
+         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         */
+        slots?:
+          | {
+              /**
+               * Format 24h (ex. 11:30).
+               */
+              open: string;
+              /**
+               * Format 24h (ex. 14:00).
+               */
+              close: string;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      sunday?: {
+        closed?: boolean | null;
+        /**
+         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         */
+        slots?:
+          | {
+              /**
+               * Format 24h (ex. 11:30).
+               */
+              open: string;
+              /**
+               * Format 24h (ex. 14:00).
+               */
+              close: string;
+              id?: string | null;
+            }[]
+          | null;
+      };
+    };
+    /**
+     * Fermetures ou horaires spéciaux (Noël, congés…). Pas de jours fériés automatiques.
+     */
+    exceptions?:
+      | {
+          startDate: string;
+          /**
+           * Laisser vide pour un jour unique.
+           */
+          endDate?: string | null;
+          type: 'closed' | 'custom_hours';
+          label?: string | null;
+          /**
+           * Affiché sur la carte / commande si ce jour est concerné.
+           */
+          note?: string | null;
+          customHours?:
+            | {
+                /**
+                 * Format 24h (ex. 11:30).
+                 */
+                open: string;
+                /**
+                 * Format 24h (ex. 14:00).
+                 */
+                close: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  clickAndCollect?: {
+    /**
+     * Si activé, le click & collect suit les horaires (hebdo + exceptions) en mode automatique.
+     */
+    enabledBySchedule?: boolean | null;
+    /**
+     * Prioritaire sur les horaires. Utile pour couper ou rouvrir le service immédiatement.
+     */
+    manualStatus?: ('auto' | 'open' | 'closed') | null;
+    /**
+     * Temps de préparation avant le premier créneau proposable.
+     */
+    minLeadTimeMinutes?: number | null;
+    slotDurationMinutes?: ('15' | '30' | '45' | '60') | null;
+    /**
+     * Optionnel. Limite le nombre de commandes par créneau de retrait.
+     */
+    maxOrdersPerSlot?: number | null;
+    tracking?: {
+      showPickupSlot?: boolean | null;
+      showCountdown?: boolean | null;
+    };
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -364,6 +566,139 @@ export interface SitesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   domain?: T;
+  contact?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+        street?: T;
+        postalCode?: T;
+        city?: T;
+      };
+  schedule?:
+    | T
+    | {
+        weeklyHours?:
+          | T
+          | {
+              monday?:
+                | T
+                | {
+                    closed?: T;
+                    slots?:
+                      | T
+                      | {
+                          open?: T;
+                          close?: T;
+                          id?: T;
+                        };
+                  };
+              tuesday?:
+                | T
+                | {
+                    closed?: T;
+                    slots?:
+                      | T
+                      | {
+                          open?: T;
+                          close?: T;
+                          id?: T;
+                        };
+                  };
+              wednesday?:
+                | T
+                | {
+                    closed?: T;
+                    slots?:
+                      | T
+                      | {
+                          open?: T;
+                          close?: T;
+                          id?: T;
+                        };
+                  };
+              thursday?:
+                | T
+                | {
+                    closed?: T;
+                    slots?:
+                      | T
+                      | {
+                          open?: T;
+                          close?: T;
+                          id?: T;
+                        };
+                  };
+              friday?:
+                | T
+                | {
+                    closed?: T;
+                    slots?:
+                      | T
+                      | {
+                          open?: T;
+                          close?: T;
+                          id?: T;
+                        };
+                  };
+              saturday?:
+                | T
+                | {
+                    closed?: T;
+                    slots?:
+                      | T
+                      | {
+                          open?: T;
+                          close?: T;
+                          id?: T;
+                        };
+                  };
+              sunday?:
+                | T
+                | {
+                    closed?: T;
+                    slots?:
+                      | T
+                      | {
+                          open?: T;
+                          close?: T;
+                          id?: T;
+                        };
+                  };
+            };
+        exceptions?:
+          | T
+          | {
+              startDate?: T;
+              endDate?: T;
+              type?: T;
+              label?: T;
+              note?: T;
+              customHours?:
+                | T
+                | {
+                    open?: T;
+                    close?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  clickAndCollect?:
+    | T
+    | {
+        enabledBySchedule?: T;
+        manualStatus?: T;
+        minLeadTimeMinutes?: T;
+        slotDurationMinutes?: T;
+        maxOrdersPerSlot?: T;
+        tracking?:
+          | T
+          | {
+              showPickupSlot?: T;
+              showCountdown?: T;
+            };
+      };
   updatedAt?: T;
   createdAt?: T;
 }

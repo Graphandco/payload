@@ -15,20 +15,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { ClickAndCollectStatusBanner } from '@/components/click-and-collect/ClickAndCollectStatusBanner'
 import { Button } from '@/components/ui/button'
 import { QuantityInput } from '@/components/ui/quantity-input'
 import { formatPrice } from '@/lib/formatPrice'
 import { useCartLines, useCartStore, useCartTotal } from '@/stores/cartStore'
+import type { Site } from '@/payload-types'
 import { CircleMinus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 type Props = {
-  siteId: number
+  site: Site
 }
 
-export function CartView({ siteId }: Props) {
+export function CartView({ site }: Props) {
+  const siteId = site.id
   const lines = useCartLines(siteId)
   const total = useCartTotal(siteId)
   const setQuantity = useCartStore((state) => state.setQuantity)
@@ -63,6 +66,7 @@ export function CartView({ siteId }: Props) {
     return (
       <div className="space-y-4 mx-auto max-w-5xl px-4 py-8 sm:py-12">
         <h1 className="text-4xl font-semibold tracking-tight">Panier</h1>
+        <ClickAndCollectStatusBanner site={site} />
         <p className="text-neutral-600">Votre panier est vide.</p>
         <Link href="/carte" className="cart-link inline-block font-medium no-underline">
           Voir la carte
@@ -73,6 +77,7 @@ export function CartView({ siteId }: Props) {
 
   return (
     <div className="space-y-8 mx-auto max-w-5xl px-4 py-8 sm:py-12">
+      <ClickAndCollectStatusBanner site={site} />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="text-3xl font-semibold tracking-tight">Panier</h1>
         <AlertDialog>

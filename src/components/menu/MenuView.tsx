@@ -5,6 +5,7 @@
 'use client'
 
 import { MenuProductRow } from '@/components/menu/MenuProductRow'
+import { ClickAndCollectStatusBanner } from '@/components/click-and-collect/ClickAndCollectStatusBanner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useHeaderHeight } from '@/hooks/useHeaderHeight'
 import type { MenuSection } from '@/lib/groupProductsByCategory'
@@ -67,6 +68,9 @@ export function MenuView({ site, sections }: Props) {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
       <h1 className="text-4xl font-semibold tracking-tight">La carte</h1>
+      <div className="mt-4">
+        <ClickAndCollectStatusBanner site={site} />
+      </div>
 
       <Tabs
         value={activeTab}
