@@ -23,6 +23,8 @@ Créer un fichier `.env` à la racine :
 ```env
 DATABASE_URL=postgres://USER:PASSWORD@127.0.0.1:5433/payload_db
 PAYLOAD_SECRET=une-chaine-secrete-longue
+# Prod (URL publique de l'admin, ex. https://cms.mondomaine.fr)
+NEXT_PUBLIC_SERVER_URL=https://cms.mondomaine.fr
 ```
 
 ## Développement local (recommandé)
@@ -411,8 +413,26 @@ COMPOSE_NETWORK=web-network bash scripts/deploy.sh
 - [ ] Migration créée et relue (`pnpm migrate:create`)
 - [ ] `src/migrations/index.ts` à jour
 - [ ] Commit + push
-- [ ] `bash scripts/deploy.sh` sur le VPS
-- [ ] Admin fonctionnel, pas d'erreur `column does not exist` dans les logs
+- [ ] `bash scripts/deploy.sh` sur le VPS (utilise `migrate:deploy`, non interactif)
+- [ ] Vérifier dans les logs deploy que `20260626_175500_weekly_hours_by_day` et les suivantes sont en **Ran: Yes**
+- [ ] Admin fonctionnel, pas d'erreur `column does not exist` / `relation does not exist` dans les logs
+
+### Erreur prod `relation "sites_schedule_weekly_hours_monday_slots" does not exist`
+
+Le code a été déployé sans la migration **horaires par jour**. Sur le VPS :
+
+```bash
+cd /chemin/vers/payload
+git pull
+bash scripts/deploy.sh
+```
+
+Ou uniquement les migrations :
+
+```bash
+docker build --target migrate -t payload-migrate -f Dockerfile .
+docker run --rm --env-file .env -e NODE_ENV=production --network web-network payload-migrate
+```
 
 ## Collections principales
 

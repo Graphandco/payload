@@ -15,9 +15,15 @@ function shouldBypass(pathname: string): boolean {
   return false
 }
 
+function getRequestHostname(req: NextRequest): string {
+  const forwarded = req.headers.get('x-forwarded-host')
+  const host = forwarded?.split(',')[0]?.trim() ?? req.headers.get('host') ?? ''
+  return host
+}
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone()
-  const hostname = req.headers.get('host') ?? ''
+  const hostname = getRequestHostname(req)
   const currentDomain = normalizeHostname(hostname)
 
   if (shouldBypass(url.pathname)) {
@@ -31,9 +37,15 @@ export function middleware(req: NextRequest) {
   const tenantKey = getTenantKeyFromHostname(hostname)
   url.pathname = `/${tenantKey}${url.pathname === '/' ? '' : url.pathname}`
 
-  const response = NextResponse.rewrite(url)
-  response.headers.set('x-tenant-domain', currentDomain)
-  response.headers.set('x-tenant-key', tenantKey)
+  const requestHeaders = new Headers(req.headers)
+  requestHeaders.set('x-tenant-domain', currentDomain)
+  requestHeaders.set('x-tenant-key', tenantKey)
+
+  const response = NextResponse.rewrite(url, {
+    request: {
+      headers: requestHeaders,
+    },
+  })
 
   return response
 }

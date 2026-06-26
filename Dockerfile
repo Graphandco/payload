@@ -51,9 +51,9 @@ RUN \
   fi
 COPY . .
 CMD \
-  if [ -f yarn.lock ]; then yarn run payload migrate; \
-  elif [ -f package-lock.json ]; then npm run payload migrate; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run migrate; \
+  if [ -f yarn.lock ]; then yarn run migrate:deploy; \
+  elif [ -f package-lock.json ]; then npm run migrate:deploy; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run migrate:deploy; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
