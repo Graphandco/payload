@@ -1,3 +1,6 @@
+/**
+ * Helpers de résolution du hostname tenant (prod derrière reverse-proxy, dev *.localhost).
+ */
 import { normalizeHostname } from './siteDomain'
 
 /**

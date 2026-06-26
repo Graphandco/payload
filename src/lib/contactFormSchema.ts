@@ -1,3 +1,6 @@
+/**
+ * Schéma Zod du formulaire contact (nom, email, message).
+ */
 import { z } from 'zod'
 
 export const contactFormSchema = z.object({

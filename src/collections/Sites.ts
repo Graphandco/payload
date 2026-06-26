@@ -1,3 +1,6 @@
+/**
+ * Collection Payload des sites (tenants) : identité, contact, horaires, click & collect.
+ */
 import type { Access, CollectionConfig } from 'payload'
 import { normalizeSiteDomain } from '../lib/siteDomain'
 import { createSlugFromField } from '../lib/slug'

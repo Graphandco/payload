@@ -1,3 +1,6 @@
+/**
+ * Contrôle d'accès multi-tenant : admins globaux vs éditeurs limités à leur(s) site(s).
+ */
 import type { Access, CollectionBeforeChangeHook, RelationshipField } from 'payload'
 
 export const isAdminUser = (user: any): boolean => user?.role === 'admin'

@@ -26,6 +26,8 @@ export interface Config {
     media: Media;
     categories: Category;
     products: Product;
+    'order-sequences': OrderSequence;
+    orders: Order;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -39,6 +41,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    'order-sequences': OrderSequencesSelect<false> | OrderSequencesSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -469,6 +473,51 @@ export interface Product {
   createdAt: string;
 }
 /**
+ * Compteur interne par site pour les numéros de commande.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order-sequences".
+ */
+export interface OrderSequence {
+  id: number;
+  site: number | Site;
+  nextNumber: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  site: number | Site;
+  orderNumber: number;
+  status: 'in_progress' | 'completed' | 'cancelled';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  pickupSlot: {
+    value: string;
+    date: string;
+    time: string;
+  };
+  lines: {
+    product?: (number | null) | Product;
+    name: string;
+    price: number;
+    quantity: number;
+    id?: string | null;
+  }[];
+  total: number;
+  trackingToken: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -515,6 +564,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'order-sequences';
+        value: number | OrderSequence;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -835,6 +892,53 @@ export interface ProductsSelect<T extends boolean = true> {
   description?: T;
   categories?: T;
   featuredImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "order-sequences_select".
+ */
+export interface OrderSequencesSelect<T extends boolean = true> {
+  site?: T;
+  nextNumber?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  site?: T;
+  orderNumber?: T;
+  status?: T;
+  paymentStatus?: T;
+  customer?:
+    | T
+    | {
+        name?: T;
+        email?: T;
+        phone?: T;
+      };
+  pickupSlot?:
+    | T
+    | {
+        value?: T;
+        date?: T;
+        time?: T;
+      };
+  lines?:
+    | T
+    | {
+        product?: T;
+        name?: T;
+        price?: T;
+        quantity?: T;
+        id?: T;
+      };
+  total?: T;
+  trackingToken?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -1,3 +1,6 @@
+/**
+ * Schéma Zod du formulaire checkout (nom, email, téléphone, créneau).
+ */
 import { z } from 'zod'
 
 export const checkoutFormSchema = z.object({

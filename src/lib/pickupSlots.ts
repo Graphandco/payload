@@ -1,3 +1,7 @@
+/**
+ * Calcul des créneaux de retrait proposables à partir des horaires du site
+ * (hebdo, exceptions, délai minimum, durée de créneau).
+ */
 import type { Site } from '@/payload-types'
 import { getEffectiveDaySchedule, getParisMinutesFromMidnight } from './siteSchedule'
 

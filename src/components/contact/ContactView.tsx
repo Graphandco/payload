@@ -1,3 +1,6 @@
+/**
+ * Affichage client de /contact : coordonnées du site et formulaire (aperçu, Resend plus tard).
+ */
 'use client'
 
 import { Button } from '@/components/ui/button'

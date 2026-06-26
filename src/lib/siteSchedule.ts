@@ -1,3 +1,7 @@
+/**
+ * Horaires effectifs et statut click & collect (fuseau Europe/Paris).
+ * Combine horaires hebdomadaires, exceptions calendrier et statut manuel du site.
+ */
 import type { Site } from '@/payload-types'
 
 export const WEEKDAYS = [

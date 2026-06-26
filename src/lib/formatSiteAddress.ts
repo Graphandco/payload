@@ -1,3 +1,6 @@
+/**
+ * Formatage et détection des coordonnées affichées sur la page contact.
+ */
 import type { Site } from '@/payload-types'
 
 type ContactAddress = NonNullable<Site['contact']>

@@ -5,6 +5,7 @@ import * as migration_20260626_124619 from './20260626_124619'
 import * as migration_20260626_145200_site_schedule_settings from './20260626_145200_site_schedule_settings'
 import * as migration_20260626_175500_weekly_hours_by_day from './20260626_175500_weekly_hours_by_day'
 import * as migration_20260626_183000_contact_address_fields from './20260626_183000_contact_address_fields'
+import * as migration_20260626_193500_orders from './20260626_193500_orders'
 
 export const migrations = [
   {
@@ -41,5 +42,10 @@ export const migrations = [
     up: migration_20260626_183000_contact_address_fields.up,
     down: migration_20260626_183000_contact_address_fields.down,
     name: '20260626_183000_contact_address_fields',
+  },
+  {
+    up: migration_20260626_193500_orders.up,
+    down: migration_20260626_193500_orders.down,
+    name: '20260626_193500_orders',
   },
 ]

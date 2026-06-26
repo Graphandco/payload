@@ -1,3 +1,6 @@
+/**
+ * Composants Form shadcn (react-hook-form) : champs, labels, messages d'erreur.
+ */
 'use client'
 
 import * as React from 'react'

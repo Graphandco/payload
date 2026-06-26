@@ -1,3 +1,7 @@
+/**
+ * Affichage client de /commande : récap panier, formulaire client, choix du créneau
+ * et envoi vers POST /api/orders.
+ */
 'use client'
 
 import { ClickAndCollectStatusBanner } from '@/components/click-and-collect/ClickAndCollectStatusBanner'
@@ -26,18 +30,21 @@ import {
   type PickupSlot,
 } from '@/lib/pickupSlots'
 import { isClickAndCollectOpen } from '@/lib/siteSchedule'
-import { useCartLines, useCartTotal, type CartLine } from '@/stores/cartStore'
+import { useCartLines, useCartStore, useCartTotal, type CartLine } from '@/stores/cartStore'
 import type { Site } from '@/payload-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 type Props = {
   site: Site
 }
 
 type SubmittedOrder = CheckoutFormValues & {
+  displayNumber: string
+  trackingToken: string
   lines: CartLine[]
   total: number
   pickupLabel: string
@@ -121,17 +128,15 @@ function PickupSlotField({
 
 function SubmittedPreview({
   order,
-  onReset,
 }: {
   order: SubmittedOrder
-  onReset: () => void
 }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Commande enregistrée (aperçu)</CardTitle>
+        <CardTitle>Commande {order.displayNumber}</CardTitle>
         <CardDescription>
-          La persistance et le paiement seront branchés à l&apos;étape suivante. Récapitulatif :
+          Votre commande est enregistrée. Le paiement en ligne sera disponible prochainement.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -169,9 +174,15 @@ function SubmittedPreview({
           <p className="menu-price mt-3 text-right font-semibold">{formatPrice(order.total)}</p>
         </div>
 
-        <Button type="button" variant="outline" onClick={onReset}>
-          Nouvelle commande
-        </Button>
+        <p className="text-sm text-muted-foreground">
+          Conservez ce lien pour suivre votre commande :{' '}
+          <Link
+            href={`/commande/suivi/${order.trackingToken}`}
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Suivre la commande
+          </Link>
+        </p>
       </CardContent>
     </Card>
   )
@@ -181,7 +192,9 @@ export function CheckoutView({ site }: Props) {
   const siteId = site.id
   const lines = useCartLines(siteId)
   const total = useCartTotal(siteId)
+  const clearSite = useCartStore((state) => state.clearSite)
   const [mounted, setMounted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState<SubmittedOrder | null>(null)
 
   const pickupSlots = useMemo(() => getAvailablePickupSlots(site), [site])
@@ -202,24 +215,67 @@ export function CheckoutView({ site }: Props) {
     }
   }, [pickupSlots, form])
 
-  const handleSubmit = (values: CheckoutFormValues) => {
+  const handleSubmit = async (values: CheckoutFormValues) => {
     const slotIsValid = pickupSlots.some((slot) => slot.value === values.pickupSlot)
     if (!slotIsValid) {
       form.setError('pickupSlot', { message: 'Créneau invalide ou plus disponible' })
       return
     }
 
-    setSubmitted({
-      ...values,
-      lines,
-      total,
-      pickupLabel: formatPickupSlotValue(values.pickupSlot),
-    })
-  }
+    setIsSubmitting(true)
 
-  const handleReset = () => {
-    setSubmitted(null)
-    form.reset(defaultValues)
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteId,
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          pickupSlot: values.pickupSlot,
+          lines: lines.map((line) => ({
+            productId: line.productId,
+            quantity: line.quantity,
+          })),
+        }),
+      })
+
+      const data = (await response.json()) as {
+        displayNumber?: string
+        trackingToken?: string
+        total?: number
+        pickupLabel?: string
+        message?: string
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message ?? 'Impossible d’enregistrer la commande.')
+      }
+
+      const snapshotLines = [...lines]
+      const snapshotTotal = total
+      const pickupLabel = data.pickupLabel ?? formatPickupSlotValue(values.pickupSlot)
+
+      clearSite(siteId)
+      setSubmitted({
+        ...values,
+        displayNumber: data.displayNumber ?? '',
+        trackingToken: data.trackingToken ?? '',
+        lines: snapshotLines,
+        total: data.total ?? snapshotTotal,
+        pickupLabel,
+      })
+      toast.success(`Commande ${data.displayNumber} enregistrée`)
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Impossible d’enregistrer la commande.'
+      toast.error(message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (!mounted) {
@@ -276,7 +332,7 @@ export function CheckoutView({ site }: Props) {
 
           <div className="mt-4">
             {submitted ? (
-              <SubmittedPreview order={submitted} onReset={handleReset} />
+              <SubmittedPreview order={submitted} />
             ) : (
               <Card>
                 <CardContent className="pt-6">
@@ -356,8 +412,12 @@ export function CheckoutView({ site }: Props) {
                         </p>
                       ) : null}
 
-                      <Button type="submit" className="w-full sm:w-auto" disabled={!canOrder}>
-                        Confirmer la commande
+                      <Button
+                        type="submit"
+                        className="w-full sm:w-auto"
+                        disabled={!canOrder || isSubmitting}
+                      >
+                        {isSubmitting ? 'Enregistrement…' : 'Confirmer la commande'}
                       </Button>
 
                       <p className="text-xs text-muted-foreground">

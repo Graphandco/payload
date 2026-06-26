@@ -1,6 +1,7 @@
+/**
+ * Bandeau client indiquant si le click & collect est ouvert ou fermé (horaires + statut manuel).
+ */
 'use client'
-
-import type { Site } from '@/payload-types'
 import { getClickAndCollectClosedMessage, isClickAndCollectOpen } from '@/lib/siteSchedule'
 
 type Props = {
