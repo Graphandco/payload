@@ -294,6 +294,14 @@ export interface Site {
      * Optionnel. Limite le nombre de commandes par créneau de retrait.
      */
     maxOrdersPerSlot?: number | null;
+    /**
+     * Optionnel. Format 24h (ex. 21:30). Dernier créneau proposable ; la fermeture peut être plus tard (ex. 22:00).
+     */
+    lastPickupSlotTime?: string | null;
+    /**
+     * Si activé, seuls les créneaux du jour en cours sont proposés (pas de commande pour le lendemain).
+     */
+    sameDayOnly?: boolean | null;
     tracking?: {
       showPickupSlot?: boolean | null;
       showCountdown?: boolean | null;
@@ -749,6 +757,8 @@ export interface SitesSelect<T extends boolean = true> {
         minLeadTimeMinutes?: T;
         slotDurationMinutes?: T;
         maxOrdersPerSlot?: T;
+        lastPickupSlotTime?: T;
+        sameDayOnly?: T;
         tracking?:
           | T
           | {

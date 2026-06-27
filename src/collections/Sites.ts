@@ -349,6 +349,26 @@ export const Sites: CollectionConfig = {
                   },
                 },
                 {
+                  name: 'lastPickupSlotTime',
+                  label: 'Dernier créneau de retrait',
+                  type: 'text',
+                  admin: {
+                    description:
+                      'Optionnel. Format 24h (ex. 21:30). Dernier créneau proposable ; la fermeture peut être plus tard (ex. 22:00).',
+                    placeholder: '21:30',
+                  },
+                },
+                {
+                  name: 'sameDayOnly',
+                  label: 'Commandes le jour même uniquement',
+                  type: 'checkbox',
+                  defaultValue: true,
+                  admin: {
+                    description:
+                      'Si activé, seuls les créneaux du jour en cours sont proposés (pas de commande pour le lendemain).',
+                  },
+                },
+                {
                   name: 'tracking',
                   label: 'Page de suivi commande',
                   type: 'group',

@@ -107,7 +107,43 @@ function getSlotDurationMinutes(site: Site): number {
 
 function getMinLeadTimeMinutes(site: Site): number {
   const lead = site.clickAndCollect?.minLeadTimeMinutes
-  return typeof lead === 'number' && lead >= 0 ? lead : 30
+  if (typeof lead === 'number' && lead >= 0) {
+    return lead
+  }
+
+  if (typeof lead === 'string' && lead.trim() !== '') {
+    const parsed = Number(lead)
+    if (!Number.isNaN(parsed) && parsed >= 0) {
+      return parsed
+    }
+  }
+
+  return 30
+}
+
+function getMaxDaysAhead(site: Site): number {
+  return site.clickAndCollect?.sameDayOnly !== false ? 1 : 7
+}
+
+function getLastPickupSlotStartMinutes(
+  site: Site,
+  closeMin: number,
+  duration: number,
+): number {
+  const raw = site.clickAndCollect?.lastPickupSlotTime
+  if (typeof raw === 'string' && raw.trim() !== '') {
+    const parsed = parseTimeParts(raw)
+    if (parsed) {
+      return parsed.h * 60 + parsed.min
+    }
+  }
+
+  return closeMin - duration
+}
+
+function getFirstSlotStartMinutes(openMin: number, duration: number): number {
+  const aligned = ceilToSlot(openMin, duration)
+  return aligned <= openMin ? aligned + duration : aligned
 }
 
 function generateSlotsForWindows(
@@ -134,9 +170,10 @@ function generateSlotsForWindows(
       closeMin = 24 * 60
     }
 
-    let current = ceilToSlot(openMin, duration)
+    const lastSlotStart = Math.min(getLastPickupSlotStartMinutes(site, closeMin, duration), closeMin - duration)
+    let current = getFirstSlotStartMinutes(openMin, duration)
 
-    while (current + duration <= closeMin) {
+    while (current <= lastSlotStart) {
       if (earliestMinutes === null || current >= earliestMinutes) {
         const time = minutesToTime(current)
         slots.push({
@@ -177,8 +214,9 @@ export function getAvailablePickupSlots(site: Site, at: Date = new Date()): Pick
   const earliestToday = getParisMinutesFromMidnight(at) + leadTime
 
   const slots: PickupSlot[] = []
+  const maxDaysAhead = getMaxDaysAhead(site)
 
-  for (let dayOffset = 0; dayOffset < MAX_DAYS_AHEAD; dayOffset += 1) {
+  for (let dayOffset = 0; dayOffset < maxDaysAhead; dayOffset += 1) {
     const { y, m, d } = addDays(startY, startM, startD, dayOffset)
     const dateKey = toDateKey(y, m, d)
     const dayDate = getParisCalendarAt(y, m, d)

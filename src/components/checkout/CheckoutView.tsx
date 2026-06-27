@@ -24,12 +24,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { checkoutFormSchema, type CheckoutFormValues } from '@/lib/checkoutFormSchema'
 import { formatPrice } from '@/lib/formatPrice'
+import { canPlaceClickAndCollectOrder } from '@/lib/clickAndCollectStatus'
 import {
   formatPickupSlotValue,
   getAvailablePickupSlots,
   type PickupSlot,
 } from '@/lib/pickupSlots'
-import { isClickAndCollectOpen } from '@/lib/siteSchedule'
 import { useCartLines, useCartStore, useCartTotal, type CartLine } from '@/stores/cartStore'
 import type { Site } from '@/payload-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -198,7 +198,7 @@ export function CheckoutView({ site }: Props) {
   const [submitted, setSubmitted] = useState<SubmittedOrder | null>(null)
 
   const pickupSlots = useMemo(() => getAvailablePickupSlots(site), [site])
-  const canOrder = isClickAndCollectOpen(site) && pickupSlots.length > 0
+  const canOrder = canPlaceClickAndCollectOrder(site)
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
@@ -308,7 +308,7 @@ export function CheckoutView({ site }: Props) {
       </p>
 
       <div className="mt-4">
-        <ClickAndCollectStatusBanner site={site} />
+        <ClickAndCollectStatusBanner site={site} unavailableOnly />
       </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-12">
@@ -408,7 +408,8 @@ export function CheckoutView({ site }: Props) {
 
                       {!canOrder ? (
                         <p className="text-sm text-amber-800">
-                          Commande indisponible : click & collect fermé ou aucun créneau libre.
+                          Commande indisponible : click & collect fermé ou aucun créneau libre
+                          aujourd&apos;hui.
                         </p>
                       ) : null}
 

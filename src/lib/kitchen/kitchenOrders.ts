@@ -5,6 +5,7 @@ import configPromise from '@payload-config'
 import type { Order } from '@/payload-types'
 import { formatOrderNumber } from '@/lib/formatOrderNumber'
 import { formatPickupSlotLabel } from '@/lib/kitchen/formatPickupSlotLabel'
+import { groupOrderLinesByCategory } from '@/lib/kitchen/groupOrderLinesByCategory'
 import type { KitchenOrder } from '@/lib/kitchen/kitchenOrderTypes'
 import { getPayload } from 'payload'
 
@@ -38,10 +39,7 @@ function serializeKitchenOrder(order: Order): KitchenOrder {
     customerPhone: order.customer.phone,
     pickupSlotValue: order.pickupSlot.value,
     pickupSlotLabel: formatPickupSlotLabel(date, order.pickupSlot.time),
-    lines: (order.lines ?? []).map((line) => ({
-      name: line.name,
-      quantity: line.quantity,
-    })),
+    lineGroups: groupOrderLinesByCategory(order),
     total: order.total,
     createdAt: order.createdAt,
   }
@@ -67,7 +65,7 @@ export async function listKitchenOrders(siteId: number): Promise<KitchenOrder[]>
       and: [{ site: { equals: siteId } }, { status: { equals: 'in_progress' } }],
     },
     limit: 200,
-    depth: 0,
+    depth: 2,
     // Sans req.user tant que requireKitchenAccess n'est pas branché sur payload.auth
     overrideAccess: true,
   })

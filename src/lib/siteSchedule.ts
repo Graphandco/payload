@@ -203,7 +203,7 @@ export function getParisMinutesFromMidnight(at: Date = new Date()): number {
   return hour * 60 + minute
 }
 
-function isWithinSlots(at: Date, slots: TimeSlot[]): boolean {
+export function isWithinSlots(at: Date, slots: TimeSlot[]): boolean {
   if (slots.length === 0) {
     return false
   }

@@ -6,12 +6,15 @@
 
 import { MenuProductRow } from '@/components/menu/MenuProductRow'
 import { ClickAndCollectStatusBanner } from '@/components/click-and-collect/ClickAndCollectStatusBanner'
+import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useHeaderHeight } from '@/hooks/useHeaderHeight'
+import { canPlaceClickAndCollectOrder } from '@/lib/clickAndCollectStatus'
 import type { MenuSection } from '@/lib/groupProductsByCategory'
 import { cn } from '@/lib/utils'
 import type { Category, Site } from '@/payload-types'
 import { RichText } from '@payloadcms/richtext-lexical/react'
+import Link from 'next/link'
 import { useState, useSyncExternalStore } from 'react'
 
 type Props = {
@@ -54,6 +57,7 @@ export function MenuView({ site, sections }: Props) {
   const stickyTop = useHeaderHeight(10)
   const defaultTab = sections.length > 0 ? getSectionId(sections[0]) : ''
   const [activeTab, setActiveTab] = useState(defaultTab)
+  const clickAndCollectAvailable = canPlaceClickAndCollectOrder(site)
 
   if (sections.length === 0) {
     return (
@@ -68,8 +72,8 @@ export function MenuView({ site, sections }: Props) {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
       <h1 className="text-4xl font-semibold tracking-tight">La carte</h1>
-      <div className="mt-4">
-        <ClickAndCollectStatusBanner site={site} />
+      <div className="mt-4 space-y-3">
+        <ClickAndCollectStatusBanner site={site} unavailableOnly />
       </div>
 
       <Tabs
@@ -119,6 +123,15 @@ export function MenuView({ site, sections }: Props) {
           })}
         </div>
       </Tabs>
+      {clickAndCollectAvailable ? (
+        <div className="mt-3 text-right">
+          <Link href="/panier">
+            <Button type="button" size="lg">
+              Aller au panier
+            </Button>
+          </Link>
+        </div>
+      ) : null}
     </div>
   )
 }

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { formatPrice } from '@/lib/formatPrice'
 import { useCartStore } from '@/stores/cartStore'
 import type { Media, Product } from '@/payload-types'
+import { PlusIcon } from 'lucide-react'
 import Image from 'next/image'
 import { toast } from 'sonner'
 
@@ -52,8 +53,14 @@ export function MenuProductRow({ siteId, product }: Props) {
           </div>
           <strong className="menu-price shrink-0">{formatPrice(product.price)}</strong>
         </div>
-        <Button type="button" size="sm" className="shrink-0" onClick={handleAdd}>
-          Ajouter
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          className="shrink-0 rounded-full"
+          onClick={handleAdd}
+        >
+          <PlusIcon className="size-4" />
         </Button>
       </div>
     </li>

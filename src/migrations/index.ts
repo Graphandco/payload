@@ -7,6 +7,7 @@ import * as migration_20260626_175500_weekly_hours_by_day from './20260626_17550
 import * as migration_20260626_183000_contact_address_fields from './20260626_183000_contact_address_fields'
 import * as migration_20260626_193500_orders from './20260626_193500_orders'
 import * as migration_20260626_200000_orders_locked_documents_rels from './20260626_200000_orders_locked_documents_rels'
+import * as migration_20260627_000000_click_and_collect_slot_settings from './20260627_000000_click_and_collect_slot_settings'
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20260626_200000_orders_locked_documents_rels.up,
     down: migration_20260626_200000_orders_locked_documents_rels.down,
     name: '20260626_200000_orders_locked_documents_rels',
+  },
+  {
+    up: migration_20260627_000000_click_and_collect_slot_settings.up,
+    down: migration_20260627_000000_click_and_collect_slot_settings.down,
+    name: '20260627_000000_click_and_collect_slot_settings',
   },
 ]

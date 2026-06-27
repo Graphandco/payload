@@ -1,6 +1,11 @@
-export type KitchenOrderLine = {
+export type KitchenOrderLineItem = {
   name: string
   quantity: number
+}
+
+export type KitchenOrderLineGroup = {
+  categoryName: string
+  lines: KitchenOrderLineItem[]
 }
 
 export type KitchenOrder = {
@@ -12,7 +17,7 @@ export type KitchenOrder = {
   customerPhone: string
   pickupSlotValue: string
   pickupSlotLabel: string
-  lines: KitchenOrderLine[]
+  lineGroups: KitchenOrderLineGroup[]
   total: number
   createdAt: string
 }
@@ -21,4 +26,11 @@ export type KitchenOrderGroup = {
   pickupSlotValue: string
   pickupSlotLabel: string
   orders: KitchenOrder[]
+}
+
+export type KitchenOrderAction = 'completed' | 'cancelled'
+
+export type KitchenPendingAction = {
+  order: KitchenOrder
+  status: KitchenOrderAction
 }

@@ -18,6 +18,7 @@ import {
 import { ClickAndCollectStatusBanner } from '@/components/click-and-collect/ClickAndCollectStatusBanner'
 import { Button } from '@/components/ui/button'
 import { QuantityInput } from '@/components/ui/quantity-input'
+import { canPlaceClickAndCollectOrder } from '@/lib/clickAndCollectStatus'
 import { formatPrice } from '@/lib/formatPrice'
 import { useCartLines, useCartStore, useCartTotal } from '@/stores/cartStore'
 import type { Site } from '@/payload-types'
@@ -38,6 +39,7 @@ export function CartView({ site }: Props) {
   const removeItem = useCartStore((state) => state.removeItem)
   const clearSite = useCartStore((state) => state.clearSite)
   const [mounted, setMounted] = useState(false)
+  const canOrder = canPlaceClickAndCollectOrder(site)
 
   useEffect(() => {
     setMounted(true)
@@ -66,7 +68,7 @@ export function CartView({ site }: Props) {
     return (
       <div className="space-y-4 mx-auto max-w-5xl px-4 py-8 sm:py-12">
         <h1 className="text-4xl font-semibold tracking-tight">Panier</h1>
-        <ClickAndCollectStatusBanner site={site} />
+        <ClickAndCollectStatusBanner site={site} unavailableOnly />
         <p className="text-neutral-600">Votre panier est vide.</p>
         <Link href="/carte" className="cart-link inline-block font-medium no-underline">
           Voir la carte
@@ -77,7 +79,7 @@ export function CartView({ site }: Props) {
 
   return (
     <div className="space-y-8 mx-auto max-w-5xl px-4 py-8 sm:py-12">
-      <ClickAndCollectStatusBanner site={site} />
+      <ClickAndCollectStatusBanner site={site} unavailableOnly />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="text-3xl font-semibold tracking-tight">Panier</h1>
         <AlertDialog>
@@ -142,9 +144,17 @@ export function CartView({ site }: Props) {
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
-        <Link href="/commande">
-          <Button type="button">Commander</Button>
-        </Link>
+        {canOrder ? (
+          <Link href="/commande">
+            <Button type="button" size="lg">
+              Commander
+            </Button>
+          </Link>
+        ) : (
+          <Button type="button" size="lg" disabled>
+            Commander
+          </Button>
+        )}
         <Link href="/carte" className="cart-link inline-block font-medium no-underline">
           Continuer mes achats
         </Link>

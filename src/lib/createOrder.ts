@@ -7,7 +7,7 @@ import type { Order, Product, Site } from '@/payload-types'
 import { createOrderRequestSchema, type CreateOrderRequest } from './createOrderRequestSchema'
 import { formatOrderNumber } from './formatOrderNumber'
 import { getAvailablePickupSlots, type PickupSlot } from './pickupSlots'
-import { isClickAndCollectOpen } from './siteSchedule'
+import { isClickAndCollectManuallyClosed } from '@/lib/clickAndCollectStatus'
 import { getPayload } from 'payload'
 import { randomUUID } from 'crypto'
 
@@ -184,7 +184,7 @@ export async function createOrder(input: unknown): Promise<CreateOrderResult> {
     throw new CreateOrderError('SITE_NOT_FOUND', 'Site introuvable.')
   }
 
-  if (!isClickAndCollectOpen(site)) {
+  if (isClickAndCollectManuallyClosed(site)) {
     throw new CreateOrderError('CLICK_AND_COLLECT_CLOSED', 'Click & collect fermé pour le moment.')
   }
 
