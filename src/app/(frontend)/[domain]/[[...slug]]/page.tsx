@@ -9,6 +9,11 @@ import { CheckoutPage, isCheckoutPath } from '@/components/checkout/CheckoutPage
 import { ContactPage, isContactPath } from '@/components/contact/ContactPage'
 import { KitchenPage, isKitchenPath } from '@/components/kitchen/KitchenPage'
 import { isMenuPath, MenuPage } from '@/components/menu/MenuPage'
+import {
+  OrderTrackingPage,
+  isOrderTrackingPath,
+  parseOrderTrackingToken,
+} from '@/components/order-tracking/OrderTrackingPage'
 import { getPageBySiteAndSlug } from '@/lib/getPageBySiteAndSlug'
 import { getSiteByTenant } from '@/lib/getSiteByTenant'
 import { loadCustomHome } from '@/lib/loadCustomHome'
@@ -75,6 +80,15 @@ export default async function TenantPage({ params }: Props) {
 
   if (isCheckoutPath(path)) {
     return <CheckoutPage site={site} />
+  }
+
+  if (isOrderTrackingPath(path)) {
+    const token = parseOrderTrackingToken(path)
+    if (!token) {
+      notFound()
+    }
+
+    return <OrderTrackingPage site={site} token={token} />
   }
 
   if (isKitchenPath(path)) {

@@ -106,141 +106,288 @@ export interface Site {
   };
   schedule?: {
     /**
-     * Un bloc par jour. Cochez « Fermé » pour fermer le lundi (ou tout autre jour) sans créneau.
+     * Midi et soir pour chaque jour. Les horaires restaurant sont indicatifs ; les créneaux click & collect pilotent les commandes.
      */
     weeklyHours?: {
-      monday?: {
+      mondayLunch?: {
         closed?: boolean | null;
         /**
-         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
          */
-        slots?:
-          | {
-              /**
-               * Format 24h (ex. 11:30).
-               */
-              open: string;
-              /**
-               * Format 24h (ex. 14:00).
-               */
-              close: string;
-              id?: string | null;
-            }[]
-          | null;
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
       };
-      tuesday?: {
+      mondayEvening?: {
         closed?: boolean | null;
         /**
-         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
          */
-        slots?:
-          | {
-              /**
-               * Format 24h (ex. 11:30).
-               */
-              open: string;
-              /**
-               * Format 24h (ex. 14:00).
-               */
-              close: string;
-              id?: string | null;
-            }[]
-          | null;
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
       };
-      wednesday?: {
+      tuesdayLunch?: {
         closed?: boolean | null;
         /**
-         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
          */
-        slots?:
-          | {
-              /**
-               * Format 24h (ex. 11:30).
-               */
-              open: string;
-              /**
-               * Format 24h (ex. 14:00).
-               */
-              close: string;
-              id?: string | null;
-            }[]
-          | null;
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
       };
-      thursday?: {
+      tuesdayEvening?: {
         closed?: boolean | null;
         /**
-         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
          */
-        slots?:
-          | {
-              /**
-               * Format 24h (ex. 11:30).
-               */
-              open: string;
-              /**
-               * Format 24h (ex. 14:00).
-               */
-              close: string;
-              id?: string | null;
-            }[]
-          | null;
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
       };
-      friday?: {
+      wednesdayLunch?: {
         closed?: boolean | null;
         /**
-         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
          */
-        slots?:
-          | {
-              /**
-               * Format 24h (ex. 11:30).
-               */
-              open: string;
-              /**
-               * Format 24h (ex. 14:00).
-               */
-              close: string;
-              id?: string | null;
-            }[]
-          | null;
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
       };
-      saturday?: {
+      wednesdayEvening?: {
         closed?: boolean | null;
         /**
-         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
          */
-        slots?:
-          | {
-              /**
-               * Format 24h (ex. 11:30).
-               */
-              open: string;
-              /**
-               * Format 24h (ex. 14:00).
-               */
-              close: string;
-              id?: string | null;
-            }[]
-          | null;
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
       };
-      sunday?: {
+      thursdayLunch?: {
         closed?: boolean | null;
         /**
-         * Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
          */
-        slots?:
-          | {
-              /**
-               * Format 24h (ex. 11:30).
-               */
-              open: string;
-              /**
-               * Format 24h (ex. 14:00).
-               */
-              close: string;
-              id?: string | null;
-            }[]
-          | null;
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
+      };
+      thursdayEvening?: {
+        closed?: boolean | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
+      };
+      fridayLunch?: {
+        closed?: boolean | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
+      };
+      fridayEvening?: {
+        closed?: boolean | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
+      };
+      saturdayLunch?: {
+        closed?: boolean | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
+      };
+      saturdayEvening?: {
+        closed?: boolean | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
+      };
+      sundayLunch?: {
+        closed?: boolean | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
+      };
+      sundayEvening?: {
+        closed?: boolean | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantOpen?: string | null;
+        /**
+         * Format 24h (ex. 11:45).
+         */
+        firstPickupSlot?: string | null;
+        /**
+         * Indicatif — affiché au client, ne pilote pas les créneaux.
+         */
+        restaurantClose?: string | null;
+        /**
+         * Format 24h (ex. 13:30).
+         */
+        lastPickupSlot?: string | null;
+        id?: string | null;
       };
     };
     /**
@@ -259,16 +406,28 @@ export interface Site {
            * Affiché sur la carte / commande si ce jour est concerné.
            */
           note?: string | null;
-          customHours?:
+          /**
+           * Même structure que les horaires hebdomadaires (midi / soir).
+           */
+          periods?:
             | {
+                closed?: boolean | null;
                 /**
-                 * Format 24h (ex. 11:30).
+                 * Indicatif — affiché au client, ne pilote pas les créneaux.
                  */
-                open: string;
+                restaurantOpen?: string | null;
                 /**
-                 * Format 24h (ex. 14:00).
+                 * Format 24h (ex. 11:45).
                  */
-                close: string;
+                firstPickupSlot?: string | null;
+                /**
+                 * Indicatif — affiché au client, ne pilote pas les créneaux.
+                 */
+                restaurantClose?: string | null;
+                /**
+                 * Format 24h (ex. 13:30).
+                 */
+                lastPickupSlot?: string | null;
                 id?: string | null;
               }[]
             | null;
@@ -278,30 +437,14 @@ export interface Site {
   };
   clickAndCollect?: {
     /**
-     * Si activé, le click & collect suit les horaires (hebdo + exceptions) en mode automatique.
-     */
-    enabledBySchedule?: boolean | null;
-    /**
-     * Prioritaire sur les horaires. Utile pour couper ou rouvrir le service immédiatement.
+     * Coupe ou rouvre le click & collect immédiatement, indépendamment des créneaux.
      */
     manualStatus?: ('auto' | 'open' | 'closed') | null;
-    /**
-     * Temps de préparation avant le premier créneau proposable.
-     */
-    minLeadTimeMinutes?: number | null;
     slotDurationMinutes?: ('15' | '30' | '45' | '60') | null;
     /**
      * Optionnel. Limite le nombre de commandes par créneau de retrait.
      */
     maxOrdersPerSlot?: number | null;
-    /**
-     * Optionnel. Format 24h (ex. 21:30). Dernier créneau proposable ; la fermeture peut être plus tard (ex. 22:00).
-     */
-    lastPickupSlotTime?: string | null;
-    /**
-     * Si activé, seuls les créneaux du jour en cours sont proposés (pas de commande pour le lendemain).
-     */
-    sameDayOnly?: boolean | null;
     tracking?: {
       showPickupSlot?: boolean | null;
       showCountdown?: boolean | null;
@@ -646,89 +789,145 @@ export interface SitesSelect<T extends boolean = true> {
         weeklyHours?:
           | T
           | {
-              monday?:
+              mondayLunch?:
                 | T
                 | {
                     closed?: T;
-                    slots?:
-                      | T
-                      | {
-                          open?: T;
-                          close?: T;
-                          id?: T;
-                        };
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
                   };
-              tuesday?:
+              mondayEvening?:
                 | T
                 | {
                     closed?: T;
-                    slots?:
-                      | T
-                      | {
-                          open?: T;
-                          close?: T;
-                          id?: T;
-                        };
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
                   };
-              wednesday?:
+              tuesdayLunch?:
                 | T
                 | {
                     closed?: T;
-                    slots?:
-                      | T
-                      | {
-                          open?: T;
-                          close?: T;
-                          id?: T;
-                        };
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
                   };
-              thursday?:
+              tuesdayEvening?:
                 | T
                 | {
                     closed?: T;
-                    slots?:
-                      | T
-                      | {
-                          open?: T;
-                          close?: T;
-                          id?: T;
-                        };
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
                   };
-              friday?:
+              wednesdayLunch?:
                 | T
                 | {
                     closed?: T;
-                    slots?:
-                      | T
-                      | {
-                          open?: T;
-                          close?: T;
-                          id?: T;
-                        };
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
                   };
-              saturday?:
+              wednesdayEvening?:
                 | T
                 | {
                     closed?: T;
-                    slots?:
-                      | T
-                      | {
-                          open?: T;
-                          close?: T;
-                          id?: T;
-                        };
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
                   };
-              sunday?:
+              thursdayLunch?:
                 | T
                 | {
                     closed?: T;
-                    slots?:
-                      | T
-                      | {
-                          open?: T;
-                          close?: T;
-                          id?: T;
-                        };
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
+                  };
+              thursdayEvening?:
+                | T
+                | {
+                    closed?: T;
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
+                  };
+              fridayLunch?:
+                | T
+                | {
+                    closed?: T;
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
+                  };
+              fridayEvening?:
+                | T
+                | {
+                    closed?: T;
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
+                  };
+              saturdayLunch?:
+                | T
+                | {
+                    closed?: T;
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
+                  };
+              saturdayEvening?:
+                | T
+                | {
+                    closed?: T;
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
+                  };
+              sundayLunch?:
+                | T
+                | {
+                    closed?: T;
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
+                  };
+              sundayEvening?:
+                | T
+                | {
+                    closed?: T;
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
+                    id?: T;
                   };
             };
         exceptions?:
@@ -739,11 +938,14 @@ export interface SitesSelect<T extends boolean = true> {
               type?: T;
               label?: T;
               note?: T;
-              customHours?:
+              periods?:
                 | T
                 | {
-                    open?: T;
-                    close?: T;
+                    closed?: T;
+                    restaurantOpen?: T;
+                    firstPickupSlot?: T;
+                    restaurantClose?: T;
+                    lastPickupSlot?: T;
                     id?: T;
                   };
               id?: T;
@@ -752,13 +954,9 @@ export interface SitesSelect<T extends boolean = true> {
   clickAndCollect?:
     | T
     | {
-        enabledBySchedule?: T;
         manualStatus?: T;
-        minLeadTimeMinutes?: T;
         slotDurationMinutes?: T;
         maxOrdersPerSlot?: T;
-        lastPickupSlotTime?: T;
-        sameDayOnly?: T;
         tracking?:
           | T
           | {

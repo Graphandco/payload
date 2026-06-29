@@ -31,11 +31,11 @@ function getLastSlotLabel(slots: PickupSlot[]): string | null {
 
 export function isRestaurantOpen(site: Site, at: Date = new Date()): boolean {
   const day = getEffectiveDaySchedule(site, at)
-  if (day.closed || day.slots.length === 0) {
+  if (day.closed || day.restaurantSlots.length === 0) {
     return false
   }
 
-  return isWithinSlots(at, day.slots)
+  return isWithinSlots(at, day.restaurantSlots)
 }
 
 export function isClickAndCollectManuallyClosed(site: Site): boolean {
@@ -60,11 +60,11 @@ export function getSiteStatusBanner(site: Site, at: Date = new Date()): SiteStat
       restaurantMessage = day.label
         ? `Restaurant fermé : ${day.label}`
         : "Restaurant fermé aujourd'hui"
-    } else if (day.slots.length === 0) {
+    } else if (day.restaurantSlots.length === 0) {
       restaurantMessage = "Restaurant fermé aujourd'hui"
     } else {
       const now = getParisMinutesFromMidnight(at)
-      const firstOpen = day.slots[0]?.open
+      const firstOpen = day.restaurantSlots[0]?.open
       restaurantMessage = firstOpen
         ? `Restaurant fermé — ouverture à ${formatTimeShort(firstOpen)}`
         : 'Restaurant fermé pour le moment'

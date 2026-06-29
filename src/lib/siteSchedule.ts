@@ -1,6 +1,5 @@
 /**
- * Horaires effectifs et statut click & collect (fuseau Europe/Paris).
- * Combine horaires hebdomadaires, exceptions calendrier et statut manuel du site.
+ * Horaires effectifs : périodes midi/soir, exceptions, affichage restaurant (indicatif).
  */
 import type { Site } from '@/payload-types'
 
@@ -16,19 +15,28 @@ export const WEEKDAYS = [
 
 export type Weekday = (typeof WEEKDAYS)[number]['value']
 
-export type TimeSlot = {
+export type ServicePeriod = {
+  closed?: boolean | null
+  restaurantOpen?: string | null
+  firstPickupSlot?: string | null
+  restaurantClose?: string | null
+  lastPickupSlot?: string | null
+}
+
+export type RestaurantSlot = {
   open: string
   close: string
 }
 
-export type WeeklyDaySchedule = {
-  closed?: boolean | null
-  slots?: TimeSlot[] | null
+export type PickupPeriod = {
+  firstPickupSlot: string
+  lastPickupSlot: string
 }
 
 export type EffectiveDaySchedule = {
   closed: boolean
-  slots: TimeSlot[]
+  restaurantSlots: RestaurantSlot[]
+  pickupPeriods: PickupPeriod[]
   label?: string | null
   note?: string | null
   source: 'weekly' | 'exception_closed' | 'exception_custom' | 'none'
@@ -45,6 +53,11 @@ const weekdayByIndex: Weekday[] = [
   'friday',
   'saturday',
 ]
+
+type ParsedPeriods = {
+  restaurantSlots: RestaurantSlot[]
+  pickupPeriods: PickupPeriod[]
+}
 
 function getParisCalendarDate(date: Date): { y: number; m: number; d: number; weekday: Weekday } {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -112,19 +125,79 @@ function isDateInRange(
   return targetKey >= startStr && targetKey <= endStr
 }
 
-function getWeeklySlotsForDay(site: Site, weekday: Weekday): TimeSlot[] {
-  const dayConfig = site.schedule?.weeklyHours?.[weekday]
-  if (!dayConfig || dayConfig.closed) {
-    return []
+function parseTimeParts(hhmm: string): { h: number; min: number } | null {
+  const match = /^(\d{1,2}):(\d{2})$/.exec(hhmm.trim())
+  if (!match) {
+    return null
   }
 
-  if (!dayConfig.slots?.length) {
-    return []
+  const h = Number(match[1])
+  const min = Number(match[2])
+  if (h < 0 || h > 23 || min < 0 || min > 59) {
+    return null
   }
 
-  return dayConfig.slots
-    .filter((slot): slot is TimeSlot => Boolean(slot?.open && slot?.close))
-    .map((slot) => ({ open: slot.open, close: slot.close }))
+  return { h, min }
+}
+
+function parseServicePeriod(period?: ServicePeriod | null): ParsedPeriods {
+  if (!period || period.closed) {
+    return { restaurantSlots: [], pickupPeriods: [] }
+  }
+
+  const restaurantSlots: RestaurantSlot[] = []
+  const pickupPeriods: PickupPeriod[] = []
+
+  if (period.restaurantOpen && period.restaurantClose) {
+    restaurantSlots.push({
+      open: period.restaurantOpen,
+      close: period.restaurantClose,
+    })
+  }
+
+  if (period.firstPickupSlot && period.lastPickupSlot) {
+    pickupPeriods.push({
+      firstPickupSlot: period.firstPickupSlot,
+      lastPickupSlot: period.lastPickupSlot,
+    })
+  }
+
+  return { restaurantSlots, pickupPeriods }
+}
+
+function mergeParsedPeriods(periods: ServicePeriod[] | null | undefined): ParsedPeriods {
+  const restaurantSlots: RestaurantSlot[] = []
+  const pickupPeriods: PickupPeriod[] = []
+
+  for (const period of periods ?? []) {
+    const parsed = parseServicePeriod(period)
+    restaurantSlots.push(...parsed.restaurantSlots)
+    pickupPeriods.push(...parsed.pickupPeriods)
+  }
+
+  return { restaurantSlots, pickupPeriods }
+}
+
+function getWeeklyDayKey(weekday: Weekday, part: 'Lunch' | 'Evening'): `${Weekday}${typeof part}` {
+  return `${weekday}${part}`
+}
+
+function getWeeklyPeriodsForDay(site: Site, weekday: Weekday): ParsedPeriods {
+  const weeklyHours = site.schedule?.weeklyHours as Record<string, ServicePeriod | undefined> | undefined
+  if (!weeklyHours) {
+    return { restaurantSlots: [], pickupPeriods: [] }
+  }
+
+  const lunch = weeklyHours[getWeeklyDayKey(weekday, 'Lunch')]
+  const evening = weeklyHours[getWeeklyDayKey(weekday, 'Evening')]
+
+  const lunchParsed = parseServicePeriod(lunch)
+  const eveningParsed = parseServicePeriod(evening)
+
+  return {
+    restaurantSlots: [...lunchParsed.restaurantSlots, ...eveningParsed.restaurantSlots],
+    pickupPeriods: [...lunchParsed.pickupPeriods, ...eveningParsed.pickupPeriods],
+  }
 }
 
 export function getEffectiveDaySchedule(site: Site, at: Date = new Date()): EffectiveDaySchedule {
@@ -143,49 +216,34 @@ export function getEffectiveDaySchedule(site: Site, at: Date = new Date()): Effe
     if (matchingException.type === 'closed') {
       return {
         closed: true,
-        slots: [],
+        restaurantSlots: [],
+        pickupPeriods: [],
         label: matchingException.label,
         note: matchingException.note,
         source: 'exception_closed',
       }
     }
 
-    const slots =
-      matchingException.customHours
-        ?.filter((slot): slot is TimeSlot => Boolean(slot?.open && slot?.close))
-        .map((slot) => ({ open: slot.open, close: slot.close })) ?? []
+    const parsed = mergeParsedPeriods(matchingException.periods)
 
     return {
-      closed: slots.length === 0,
-      slots,
+      closed: parsed.pickupPeriods.length === 0 && parsed.restaurantSlots.length === 0,
+      restaurantSlots: parsed.restaurantSlots,
+      pickupPeriods: parsed.pickupPeriods,
       label: matchingException.label,
       note: matchingException.note,
       source: 'exception_custom',
     }
   }
 
-  const slots = getWeeklySlotsForDay(site, calendar.weekday)
+  const parsed = getWeeklyPeriodsForDay(site, calendar.weekday)
 
   return {
-    closed: slots.length === 0,
-    slots,
-    source: slots.length > 0 ? 'weekly' : 'none',
+    closed: parsed.pickupPeriods.length === 0 && parsed.restaurantSlots.length === 0,
+    restaurantSlots: parsed.restaurantSlots,
+    pickupPeriods: parsed.pickupPeriods,
+    source: parsed.pickupPeriods.length > 0 || parsed.restaurantSlots.length > 0 ? 'weekly' : 'none',
   }
-}
-
-function parseTimeParts(hhmm: string): { h: number; min: number } | null {
-  const match = /^(\d{1,2}):(\d{2})$/.exec(hhmm.trim())
-  if (!match) {
-    return null
-  }
-
-  const h = Number(match[1])
-  const min = Number(match[2])
-  if (h < 0 || h > 23 || min < 0 || min > 59) {
-    return null
-  }
-
-  return { h, min }
 }
 
 /** Minutes depuis minuit (fuseau Paris) pour un instant donné. */
@@ -203,7 +261,7 @@ export function getParisMinutesFromMidnight(at: Date = new Date()): number {
   return hour * 60 + minute
 }
 
-export function isWithinSlots(at: Date, slots: TimeSlot[]): boolean {
+export function isWithinSlots(at: Date, slots: RestaurantSlot[]): boolean {
   if (slots.length === 0) {
     return false
   }
@@ -228,34 +286,20 @@ export function isWithinSlots(at: Date, slots: TimeSlot[]): boolean {
   })
 }
 
-export function isClickAndCollectOpen(site: Site, at: Date = new Date()): boolean {
-  const config = site.clickAndCollect
-  const manualStatus = config?.manualStatus ?? 'auto'
-
-  if (manualStatus === 'closed') {
-    return false
-  }
-
-  if (manualStatus === 'open') {
-    return true
-  }
-
-  const respectSchedule = config?.enabledBySchedule !== false
-  if (!respectSchedule) {
-    return true
-  }
-
-  const day = getEffectiveDaySchedule(site, at)
-  if (day.closed) {
-    return false
-  }
-
-  return isWithinSlots(at, day.slots)
+/** Fuseau Paris */
+export function getParisDateKey(at: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: PARIS_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(at)
 }
 
 export function getClickAndCollectClosedMessage(site: Site, at: Date = new Date()): string | null {
-  if (isClickAndCollectOpen(site, at)) {
-    return null
+  const manualStatus = site.clickAndCollect?.manualStatus ?? 'auto'
+  if (manualStatus === 'closed') {
+    return 'Click & collect temporairement fermé.'
   }
 
   const day = getEffectiveDaySchedule(site, at)
@@ -267,14 +311,9 @@ export function getClickAndCollectClosedMessage(site: Site, at: Date = new Date(
     return `Click & collect fermé : ${day.label}.`
   }
 
-  const manualStatus = site.clickAndCollect?.manualStatus ?? 'auto'
-  if (manualStatus === 'closed') {
-    return 'Click & collect temporairement fermé.'
-  }
-
-  if (day.closed) {
+  if (day.closed || day.pickupPeriods.length === 0) {
     return "Click & collect fermé aujourd'hui."
   }
 
-  return 'Click & collect fermé pour le moment.'
+  return 'Click & collect indisponible pour le moment.'
 }

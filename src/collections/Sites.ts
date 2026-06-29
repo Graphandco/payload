@@ -11,6 +11,7 @@ import {
   userIsAdmin,
 } from '../lib/siteAccess'
 import { WEEKDAYS } from '../lib/siteSchedule'
+import { servicePeriodFields } from '../lib/servicePeriodFields'
 
 const isAdmin: Access = async ({ req }) => userIsAdmin(req)
 
@@ -18,56 +19,26 @@ const adminOnlyFieldUpdate = {
   update: async ({ req }: { req: { user?: unknown } }) => userIsAdmin(req),
 }
 
-const timeSlotFields = [
+const weeklyDayFields = WEEKDAYS.flatMap(({ label, value }) => [
   {
-    name: 'open',
-    label: 'Ouverture',
-    type: 'text' as const,
-    required: true,
+    name: `${value}Lunch`,
+    label: `${label} midi`,
+    type: 'group' as const,
     admin: {
-      description: 'Format 24h (ex. 11:30).',
-      placeholder: '11:30',
+      hideGutter: true,
     },
+    fields: servicePeriodFields,
   },
   {
-    name: 'close',
-    label: 'Fermeture',
-    type: 'text' as const,
-    required: true,
+    name: `${value}Evening`,
+    label: `${label} soir`,
+    type: 'group' as const,
     admin: {
-      description: 'Format 24h (ex. 14:00).',
-      placeholder: '14:00',
+      hideGutter: true,
     },
+    fields: servicePeriodFields,
   },
-]
-
-const weeklyDayFields = WEEKDAYS.map(({ label, value }) => ({
-  name: value,
-  label,
-  type: 'group' as const,
-  admin: {
-    hideGutter: true,
-  },
-  fields: [
-    {
-      name: 'closed',
-      label: 'Fermé',
-      type: 'checkbox' as const,
-      defaultValue: false,
-    },
-    {
-      name: 'slots',
-      label: 'Créneaux',
-      type: 'array' as const,
-      admin: {
-        condition: (_: unknown, siblingData: { closed?: boolean }) => siblingData?.closed !== true,
-        description: 'Ex. 11:30–14:00 et 18:00–22:00 pour le service midi et soir.',
-        initCollapsed: true,
-      },
-      fields: timeSlotFields,
-    },
-  ],
-}))
+])
 
 export const Sites: CollectionConfig = {
   slug: 'sites',
@@ -205,7 +176,7 @@ export const Sites: CollectionConfig = {
                   type: 'group',
                   admin: {
                     description:
-                      "Un bloc par jour. Cochez « Fermé » pour fermer le lundi (ou tout autre jour) sans créneau.",
+                      'Midi et soir pour chaque jour. Les horaires restaurant sont indicatifs ; les créneaux click & collect pilotent les commandes.',
                   },
                   fields: weeklyDayFields,
                 },
@@ -217,6 +188,9 @@ export const Sites: CollectionConfig = {
                     description:
                       'Fermetures ou horaires spéciaux (Noël, congés…). Pas de jours fériés automatiques.',
                     initCollapsed: true,
+                    components: {
+                      RowLabel: '@/components/admin/ScheduleExceptionRowLabel#ScheduleExceptionRowLabel',
+                    },
                   },
                   fields: [
                     {
@@ -271,13 +245,14 @@ export const Sites: CollectionConfig = {
                       },
                     },
                     {
-                      name: 'customHours',
-                      label: 'Horaires spéciaux',
+                      name: 'periods',
+                      label: 'Périodes',
                       type: 'array',
                       admin: {
                         condition: (_, siblingData) => siblingData?.type === 'custom_hours',
+                        description: 'Même structure que les horaires hebdomadaires (midi / soir).',
                       },
-                      fields: timeSlotFields,
+                      fields: servicePeriodFields,
                     },
                   ],
                 },
@@ -293,38 +268,18 @@ export const Sites: CollectionConfig = {
               type: 'group',
               fields: [
                 {
-                  name: 'enabledBySchedule',
-                  label: 'Respecter les horaires',
-                  type: 'checkbox',
-                  defaultValue: true,
-                  admin: {
-                    description:
-                      'Si activé, le click & collect suit les horaires (hebdo + exceptions) en mode automatique.',
-                  },
-                },
-                {
                   name: 'manualStatus',
                   label: 'Statut manuel',
                   type: 'select',
                   defaultValue: 'auto',
                   options: [
-                    { label: 'Automatique (horaires)', value: 'auto' },
+                    { label: 'Automatique', value: 'auto' },
                     { label: 'Ouvert', value: 'open' },
                     { label: 'Fermé', value: 'closed' },
                   ],
                   admin: {
                     description:
-                      'Prioritaire sur les horaires. Utile pour couper ou rouvrir le service immédiatement.',
-                  },
-                },
-                {
-                  name: 'minLeadTimeMinutes',
-                  label: 'Délai minimum (minutes)',
-                  type: 'number',
-                  defaultValue: 30,
-                  min: 0,
-                  admin: {
-                    description: 'Temps de préparation avant le premier créneau proposable.',
+                      'Coupe ou rouvre le click & collect immédiatement, indépendamment des créneaux.',
                   },
                 },
                 {
@@ -346,26 +301,6 @@ export const Sites: CollectionConfig = {
                   min: 1,
                   admin: {
                     description: 'Optionnel. Limite le nombre de commandes par créneau de retrait.',
-                  },
-                },
-                {
-                  name: 'lastPickupSlotTime',
-                  label: 'Dernier créneau de retrait',
-                  type: 'text',
-                  admin: {
-                    description:
-                      'Optionnel. Format 24h (ex. 21:30). Dernier créneau proposable ; la fermeture peut être plus tard (ex. 22:00).',
-                    placeholder: '21:30',
-                  },
-                },
-                {
-                  name: 'sameDayOnly',
-                  label: 'Commandes le jour même uniquement',
-                  type: 'checkbox',
-                  defaultValue: true,
-                  admin: {
-                    description:
-                      'Si activé, seuls les créneaux du jour en cours sont proposés (pas de commande pour le lendemain).',
                   },
                 },
                 {

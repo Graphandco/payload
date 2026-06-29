@@ -1,12 +1,12 @@
 /**
- * Calcul des créneaux de retrait proposables à partir des horaires du site
- * (hebdo, exceptions, délai minimum, durée de créneau).
+ * Calcul des créneaux de retrait à partir des périodes click & collect (midi/soir).
+ * Uniquement le jour même (pas de commande pour le lendemain).
+ * Propose le créneau suivant le prochain créneau théorique (ex. 12h05 → 12h30, pas 12h15).
  */
 import type { Site } from '@/payload-types'
-import { getEffectiveDaySchedule, getParisMinutesFromMidnight } from './siteSchedule'
+import { getEffectiveDaySchedule, getParisDateKey, getParisMinutesFromMidnight } from './siteSchedule'
 
 const PARIS_TZ = 'Europe/Paris'
-const MAX_DAYS_AHEAD = 7
 const MAX_SLOTS = 48
 
 export type PickupSlot = {
@@ -31,6 +31,15 @@ function parseTimeParts(hhmm: string): { h: number; min: number } | null {
   return { h, min }
 }
 
+function timeToMinutes(time: string): number | null {
+  const parsed = parseTimeParts(time)
+  if (!parsed) {
+    return null
+  }
+
+  return parsed.h * 60 + parsed.min
+}
+
 function minutesToTime(totalMinutes: number): string {
   const h = Math.floor(totalMinutes / 60)
   const min = totalMinutes % 60
@@ -41,17 +50,13 @@ function ceilToSlot(minutes: number, duration: number): number {
   return Math.ceil(minutes / duration) * duration
 }
 
-function toDateKey(y: number, m: number, d: number): string {
-  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+function getEarliestBookableMinutes(nowMin: number, duration: number): number {
+  const nextSlot = ceilToSlot(nowMin, duration)
+  return nextSlot + duration
 }
 
-function addDays(y: number, m: number, d: number, days: number): { y: number; m: number; d: number } {
-  const date = new Date(Date.UTC(y, m - 1, d + days))
-  return {
-    y: date.getUTCFullYear(),
-    m: date.getUTCMonth() + 1,
-    d: date.getUTCDate(),
-  }
+function toDateKey(y: number, m: number, d: number): string {
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
 }
 
 function getParisCalendarAt(y: number, m: number, d: number, hour = 12): Date {
@@ -105,93 +110,45 @@ function getSlotDurationMinutes(site: Site): number {
   return duration > 0 ? duration : 30
 }
 
-function getMinLeadTimeMinutes(site: Site): number {
-  const lead = site.clickAndCollect?.minLeadTimeMinutes
-  if (typeof lead === 'number' && lead >= 0) {
-    return lead
-  }
-
-  if (typeof lead === 'string' && lead.trim() !== '') {
-    const parsed = Number(lead)
-    if (!Number.isNaN(parsed) && parsed >= 0) {
-      return parsed
-    }
-  }
-
-  return 30
-}
-
-function getMaxDaysAhead(site: Site): number {
-  return site.clickAndCollect?.sameDayOnly !== false ? 1 : 7
-}
-
-function getLastPickupSlotStartMinutes(
-  site: Site,
-  closeMin: number,
-  duration: number,
-): number {
-  const raw = site.clickAndCollect?.lastPickupSlotTime
-  if (typeof raw === 'string' && raw.trim() !== '') {
-    const parsed = parseTimeParts(raw)
-    if (parsed) {
-      return parsed.h * 60 + parsed.min
-    }
-  }
-
-  return closeMin - duration
-}
-
-function getFirstSlotStartMinutes(openMin: number, duration: number): number {
-  const aligned = ceilToSlot(openMin, duration)
-  return aligned <= openMin ? aligned + duration : aligned
-}
-
-function generateSlotsForWindows(
-  site: Site,
+function generateSlotsForPickupPeriod(
   dateKey: string,
-  windows: { open: string; close: string }[],
+  firstPickupSlot: string,
+  lastPickupSlot: string,
+  duration: number,
   earliestMinutes: number | null,
   now: Date,
 ): PickupSlot[] {
-  const duration = getSlotDurationMinutes(site)
+  const firstMin = timeToMinutes(firstPickupSlot)
+  const lastMin = timeToMinutes(lastPickupSlot)
+  if (firstMin === null || lastMin === null || lastMin < firstMin) {
+    return []
+  }
+
   const slots: PickupSlot[] = []
+  let current = ceilToSlot(firstMin, duration)
 
-  for (const window of windows) {
-    const open = parseTimeParts(window.open)
-    const close = parseTimeParts(window.close)
-    if (!open || !close) {
-      continue
+  while (current <= lastMin) {
+    if (earliestMinutes === null || current >= earliestMinutes) {
+      const time = minutesToTime(current)
+      slots.push({
+        value: `${dateKey}T${time}`,
+        dateKey,
+        time,
+        label: formatSlotLabel(dateKey, time, now),
+      })
     }
 
-    let openMin = open.h * 60 + open.min
-    let closeMin = close.h * 60 + close.min
-
-    if (closeMin <= openMin) {
-      closeMin = 24 * 60
-    }
-
-    const lastSlotStart = Math.min(getLastPickupSlotStartMinutes(site, closeMin, duration), closeMin - duration)
-    let current = getFirstSlotStartMinutes(openMin, duration)
-
-    while (current <= lastSlotStart) {
-      if (earliestMinutes === null || current >= earliestMinutes) {
-        const time = minutesToTime(current)
-        slots.push({
-          value: `${dateKey}T${time}`,
-          dateKey,
-          time,
-          label: formatSlotLabel(dateKey, time, now),
-        })
-      }
-
-      current += duration
-    }
+    current += duration
   }
 
   return slots
 }
 
 export function getAvailablePickupSlots(site: Site, at: Date = new Date()): PickupSlot[] {
+  if (site.clickAndCollect?.manualStatus === 'closed') {
+    return []
+  }
+
   const todayParts = new Intl.DateTimeFormat('en-CA', {
     timeZone: PARIS_TZ,
     year: 'numeric',
@@ -206,38 +163,38 @@ export function getAvailablePickupSlots(site: Site, at: Date = new Date()): Pick
       return acc
     }, {})
 
-  const startY = Number(todayParts.year)
-  const startM = Number(todayParts.month)
-  const startD = Number(todayParts.day)
+  const y = Number(todayParts.year)
+  const m = Number(todayParts.month)
+  const d = Number(todayParts.day)
+  const dateKey = toDateKey(y, m, d)
+  const duration = getSlotDurationMinutes(site)
+  const nowMin = getParisMinutesFromMidnight(at)
+  const earliestMinutes = getEarliestBookableMinutes(nowMin, duration)
 
-  const leadTime = getMinLeadTimeMinutes(site)
-  const earliestToday = getParisMinutesFromMidnight(at) + leadTime
+  const daySchedule = getEffectiveDaySchedule(site, getParisCalendarAt(y, m, d))
 
-  const slots: PickupSlot[] = []
-  const maxDaysAhead = getMaxDaysAhead(site)
-
-  for (let dayOffset = 0; dayOffset < maxDaysAhead; dayOffset += 1) {
-    const { y, m, d } = addDays(startY, startM, startD, dayOffset)
-    const dateKey = toDateKey(y, m, d)
-    const dayDate = getParisCalendarAt(y, m, d)
-    const daySchedule = getEffectiveDaySchedule(site, dayDate)
-
-    if (daySchedule.closed || daySchedule.slots.length === 0) {
-      continue
-    }
-
-    const earliestMinutes = dayOffset === 0 ? ceilToSlot(earliestToday, getSlotDurationMinutes(site)) : null
-
-    slots.push(
-      ...generateSlotsForWindows(site, dateKey, daySchedule.slots, earliestMinutes, at),
-    )
-
-    if (slots.length >= MAX_SLOTS) {
-      break
-    }
+  if (daySchedule.closed || daySchedule.pickupPeriods.length === 0) {
+    return []
   }
 
-  return slots.slice(0, MAX_SLOTS)
+  const slots: PickupSlot[] = []
+
+  for (const period of daySchedule.pickupPeriods) {
+    slots.push(
+      ...generateSlotsForPickupPeriod(
+        dateKey,
+        period.firstPickupSlot,
+        period.lastPickupSlot,
+        duration,
+        earliestMinutes,
+        at,
+      ),
+    )
+  }
+
+  return slots
+    .sort((a, b) => a.value.localeCompare(b.value))
+    .slice(0, MAX_SLOTS)
 }
 
 export function formatPickupSlotValue(value: string, now: Date = new Date()): string {

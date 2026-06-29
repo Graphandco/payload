@@ -34,6 +34,7 @@ import { useCartLines, useCartStore, useCartTotal, type CartLine } from '@/store
 import type { Site } from '@/payload-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -189,6 +190,7 @@ function SubmittedPreview({
 }
 
 export function CheckoutView({ site }: Props) {
+  const router = useRouter()
   const siteId = site.id
   const lines = useCartLines(siteId)
   const total = useCartTotal(siteId)
@@ -258,8 +260,16 @@ export function CheckoutView({ site }: Props) {
       const snapshotLines = [...lines]
       const snapshotTotal = total
       const pickupLabel = data.pickupLabel ?? formatPickupSlotValue(values.pickupSlot)
+      const trackingToken = data.trackingToken ?? ''
 
       clearSite(siteId)
+      toast.success(`Commande ${data.displayNumber} enregistrée`)
+
+      if (trackingToken) {
+        router.push(`/commande/suivi/${trackingToken}`)
+        return
+      }
+
       setSubmitted({
         ...values,
         displayNumber: data.displayNumber ?? '',
@@ -268,7 +278,6 @@ export function CheckoutView({ site }: Props) {
         total: data.total ?? snapshotTotal,
         pickupLabel,
       })
-      toast.success(`Commande ${data.displayNumber} enregistrée`)
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Impossible d’enregistrer la commande.'
@@ -287,7 +296,7 @@ export function CheckoutView({ site }: Props) {
     )
   }
 
-  if (lines.length === 0) {
+  if (lines.length === 0 && !submitted) {
     return (
       <div className="mx-auto max-w-5xl space-y-4 px-4 py-8 sm:py-12">
         <h1 className="text-4xl font-semibold tracking-tight">Commande</h1>

@@ -7,6 +7,7 @@ import type { Order, Product, Site } from '@/payload-types'
 import { createOrderRequestSchema, type CreateOrderRequest } from './createOrderRequestSchema'
 import { formatOrderNumber } from './formatOrderNumber'
 import { getAvailablePickupSlots, type PickupSlot } from './pickupSlots'
+import { getParisDateKey } from './siteSchedule'
 import { isClickAndCollectManuallyClosed } from '@/lib/clickAndCollectStatus'
 import { getPayload } from 'payload'
 import { randomUUID } from 'crypto'
@@ -196,6 +197,13 @@ export async function createOrder(input: unknown): Promise<CreateOrderResult> {
   const parsedSlot = parsePickupSlotValue(data.pickupSlot)
   if (!parsedSlot) {
     throw new CreateOrderError('INVALID_PICKUP_SLOT', 'Créneau invalide.')
+  }
+
+  if (parsedSlot.date !== getParisDateKey()) {
+    throw new CreateOrderError(
+      'INVALID_PICKUP_SLOT',
+      'Seuls les créneaux du jour même sont acceptés.',
+    )
   }
 
   const maxPerSlot = site.clickAndCollect?.maxOrdersPerSlot
