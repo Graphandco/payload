@@ -45,3 +45,65 @@ describe('getSitePublicUrl', () => {
     expect(url).toBe('http://graphandco.localhost:3000/commande/suivi/abc-123')
   })
 })
+
+describe('getMollieWebhookUrl', () => {
+  it('uses MOLLIE_WEBHOOK_URL when set', async () => {
+    const previous = process.env.MOLLIE_WEBHOOK_URL
+    process.env.MOLLIE_WEBHOOK_URL = 'https://clickandcollect.graphandco.com/api/mollie/webhook'
+
+    const { getMollieWebhookUrl } = await import('@/lib/mollie')
+    expect(getMollieWebhookUrl()).toBe('https://clickandcollect.graphandco.com/api/mollie/webhook')
+
+    if (previous === undefined) {
+      delete process.env.MOLLIE_WEBHOOK_URL
+    } else {
+      process.env.MOLLIE_WEBHOOK_URL = previous
+    }
+  })
+
+  it('builds URL from NEXT_PUBLIC_SERVER_URL', async () => {
+    const previousWebhook = process.env.MOLLIE_WEBHOOK_URL
+    const previousServer = process.env.NEXT_PUBLIC_SERVER_URL
+    delete process.env.MOLLIE_WEBHOOK_URL
+    process.env.NEXT_PUBLIC_SERVER_URL = 'https://clickandcollect.graphandco.com'
+
+    const { getMollieWebhookUrl } = await import('@/lib/mollie')
+    expect(getMollieWebhookUrl()).toBe('https://clickandcollect.graphandco.com/api/mollie/webhook')
+
+    if (previousWebhook === undefined) {
+      delete process.env.MOLLIE_WEBHOOK_URL
+    } else {
+      process.env.MOLLIE_WEBHOOK_URL = previousWebhook
+    }
+
+    if (previousServer === undefined) {
+      delete process.env.NEXT_PUBLIC_SERVER_URL
+    } else {
+      process.env.NEXT_PUBLIC_SERVER_URL = previousServer
+    }
+  })
+})
+
+describe('parseMollieWebhookPaymentId', () => {
+  it('parses form-urlencoded body', async () => {
+    const { parseMollieWebhookPaymentId } = await import('@/lib/mollieWebhook')
+    const request = new Request('https://example.com/api/mollie/webhook', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: 'id=tr_abc123',
+    })
+
+    await expect(parseMollieWebhookPaymentId(request)).resolves.toBe('tr_abc123')
+  })
+
+  it('parses json body', async () => {
+    const { parseMollieWebhookPaymentId } = await import('@/lib/mollieWebhook')
+    const request = new Request('https://example.com/api/mollie/webhook', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id: 'tr_json456' }),
+    })
+
+    await expect(parseMollieWebhookPaymentId(request)).resolves.toBe('tr_json456')
+  })
+})
