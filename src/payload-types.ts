@@ -445,6 +445,10 @@ export interface Site {
      * Optionnel. Limite le nombre de commandes par créneau de retrait.
      */
     maxOrdersPerSlot?: number | null;
+    /**
+     * Clé API Mollie du site (test_… en dev, live_… en prod). Active le paiement en ligne au checkout.
+     */
+    mollieApiKey?: string | null;
     tracking?: {
       showPickupSlot?: boolean | null;
       showCountdown?: boolean | null;
@@ -646,6 +650,7 @@ export interface Order {
   orderNumber: number;
   status: 'in_progress' | 'completed' | 'cancelled';
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  molliePaymentId?: string | null;
   customer: {
     name: string;
     email: string;
@@ -957,6 +962,7 @@ export interface SitesSelect<T extends boolean = true> {
         manualStatus?: T;
         slotDurationMinutes?: T;
         maxOrdersPerSlot?: T;
+        mollieApiKey?: T;
         tracking?:
           | T
           | {
@@ -1122,6 +1128,7 @@ export interface OrdersSelect<T extends boolean = true> {
   orderNumber?: T;
   status?: T;
   paymentStatus?: T;
+  molliePaymentId?: T;
   customer?:
     | T
     | {

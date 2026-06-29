@@ -3,6 +3,7 @@
  */
 import { getOrderByTrackingToken } from '@/lib/getOrderByTrackingToken'
 import { serializePublicOrderTracking } from '@/lib/orderTracking'
+import { syncOrderPaymentFromMollie } from '@/lib/syncOrderPayment'
 import configPromise from '@payload-config'
 import type { Site } from '@/payload-types'
 import { getPayload } from 'payload'
@@ -50,8 +51,10 @@ export async function GET(request: Request, context: RouteContext) {
       return Response.json({ error: 'NOT_FOUND', message: 'Commande introuvable.' }, { status: 404 })
     }
 
+    const syncedOrder = await syncOrderPaymentFromMollie(site, order)
+
     return Response.json({
-      order: serializePublicOrderTracking(order, site),
+      order: serializePublicOrderTracking(syncedOrder, site),
     })
   } catch (error) {
     console.error('[GET /api/orders/track/[token]]', error)

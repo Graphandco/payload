@@ -6,7 +6,9 @@ import configPromise from '@payload-config'
 import type { Order, Product, Site } from '@/payload-types'
 import { createOrderRequestSchema, type CreateOrderRequest } from './createOrderRequestSchema'
 import { formatOrderNumber } from './formatOrderNumber'
+import { getOrderTrackingUrl } from './getSitePublicUrl'
 import { getAvailablePickupSlots, type PickupSlot } from './pickupSlots'
+import { createMolliePaymentForOrder, isMollieConfigured } from './mollie'
 import { getParisDateKey } from './siteSchedule'
 import { isClickAndCollectManuallyClosed } from '@/lib/clickAndCollectStatus'
 import { getPayload } from 'payload'
@@ -19,6 +21,11 @@ export type CreateOrderResult = {
   trackingToken: string
   total: number
   pickupLabel: string
+  checkoutUrl?: string
+}
+
+export type CreateOrderOptions = {
+  origin?: string
 }
 
 export type CreateOrderErrorCode =
@@ -29,6 +36,7 @@ export type CreateOrderErrorCode =
   | 'SLOT_FULL'
   | 'INVALID_LINES'
   | 'EMPTY_CART'
+  | 'PAYMENT_FAILED'
 
 export class CreateOrderError extends Error {
   code: CreateOrderErrorCode
@@ -163,7 +171,10 @@ async function resolveOrderLines(
   return { lines: orderLines, total }
 }
 
-export async function createOrder(input: unknown): Promise<CreateOrderResult> {
+export async function createOrder(
+  input: unknown,
+  options?: CreateOrderOptions,
+): Promise<CreateOrderResult> {
   const parsed = createOrderRequestSchema.safeParse(input)
   if (!parsed.success) {
     throw new CreateOrderError('INVALID_BODY', 'Données de commande invalides.')
@@ -244,12 +255,57 @@ export async function createOrder(input: unknown): Promise<CreateOrderResult> {
     overrideAccess: true,
   })
 
-  return {
+  const result: CreateOrderResult = {
     id: order.id,
     orderNumber,
     displayNumber: formatOrderNumber(orderNumber),
     trackingToken,
     total,
     pickupLabel,
+  }
+
+  if (!isMollieConfigured(site)) {
+    return result
+  }
+
+  const redirectUrl = getOrderTrackingUrl(site, trackingToken, { origin: options?.origin })
+
+  try {
+    const { paymentId, checkoutUrl } = await createMolliePaymentForOrder({
+      site,
+      order: order as Order,
+      redirectUrl,
+    })
+
+    await payload.update({
+      collection: 'orders',
+      id: order.id,
+      data: {
+        molliePaymentId: paymentId,
+      },
+      overrideAccess: true,
+    })
+
+    return {
+      ...result,
+      checkoutUrl,
+    }
+  } catch (error) {
+    console.error('[createOrder] Mollie payment creation failed', error)
+
+    await payload.update({
+      collection: 'orders',
+      id: order.id,
+      data: {
+        status: 'cancelled',
+        paymentStatus: 'failed',
+      },
+      overrideAccess: true,
+    })
+
+    throw new CreateOrderError(
+      'PAYMENT_FAILED',
+      'Impossible d’initialiser le paiement. Réessayez dans quelques instants.',
+    )
   }
 }

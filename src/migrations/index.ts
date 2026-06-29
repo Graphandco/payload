@@ -9,6 +9,7 @@ import * as migration_20260626_193500_orders from './20260626_193500_orders'
 import * as migration_20260626_200000_orders_locked_documents_rels from './20260626_200000_orders_locked_documents_rels'
 import * as migration_20260627_000000_click_and_collect_slot_settings from './20260627_000000_click_and_collect_slot_settings'
 import * as migration_20260628_063500_schedule_service_periods from './20260628_063500_schedule_service_periods'
+import * as migration_20260628_120000_mollie_payment from './20260628_120000_mollie_payment'
 
 export const migrations = [
   {
@@ -65,5 +66,10 @@ export const migrations = [
     up: migration_20260628_063500_schedule_service_periods.up,
     down: migration_20260628_063500_schedule_service_periods.down,
     name: '20260628_063500_schedule_service_periods',
+  },
+  {
+    up: migration_20260628_120000_mollie_payment.up,
+    down: migration_20260628_120000_mollie_payment.down,
+    name: '20260628_120000_mollie_payment',
   },
 ]

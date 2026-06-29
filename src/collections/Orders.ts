@@ -71,6 +71,15 @@ export const Orders: CollectionConfig = {
       ],
     },
     {
+      name: 'molliePaymentId',
+      label: 'ID paiement Mollie',
+      type: 'text',
+      index: true,
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
       name: 'customer',
       label: 'Client',
       type: 'group',

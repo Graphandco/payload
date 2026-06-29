@@ -304,6 +304,16 @@ export const Sites: CollectionConfig = {
                   },
                 },
                 {
+                  name: 'mollieApiKey',
+                  label: 'Clé API Mollie',
+                  type: 'text',
+                  access: adminOnlyFieldUpdate,
+                  admin: {
+                    description:
+                      'Clé API Mollie du site (test_… en dev, live_… en prod). Active le paiement en ligne au checkout.',
+                  },
+                },
+                {
                   name: 'tracking',
                   label: 'Page de suivi commande',
                   type: 'group',

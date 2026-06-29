@@ -4,6 +4,7 @@
 import { OrderTrackingView } from '@/components/order-tracking/OrderTrackingView'
 import { getOrderByTrackingToken } from '@/lib/getOrderByTrackingToken'
 import { serializePublicOrderTracking } from '@/lib/orderTracking'
+import { syncOrderPaymentFromMollie } from '@/lib/syncOrderPayment'
 import type { Site } from '@/payload-types'
 import { notFound } from 'next/navigation'
 
@@ -21,7 +22,8 @@ export async function OrderTrackingPage({ site, token }: Props) {
     notFound()
   }
 
-  const initialOrder = serializePublicOrderTracking(order, site)
+  const syncedOrder = await syncOrderPaymentFromMollie(site, order)
+  const initialOrder = serializePublicOrderTracking(syncedOrder, site)
 
   return <OrderTrackingView site={site} token={token} initialOrder={initialOrder} />
 }

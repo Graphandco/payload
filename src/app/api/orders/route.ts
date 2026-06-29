@@ -2,11 +2,13 @@
  * Endpoint public de création de commande (checkout). Délègue à createOrder.
  */
 import { createOrder, CreateOrderError } from '@/lib/createOrder'
+import { getRequestOrigin } from '@/lib/getSitePublicUrl'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const order = await createOrder(body)
+    const origin = getRequestOrigin(request)
+    const order = await createOrder(body, { origin })
 
     return Response.json(order, { status: 201 })
   } catch (error) {
@@ -16,7 +18,9 @@ export async function POST(request: Request) {
           ? 404
           : error.code === 'INVALID_BODY' || error.code === 'INVALID_LINES'
             ? 400
-            : 409
+            : error.code === 'PAYMENT_FAILED'
+              ? 502
+              : 409
 
       return Response.json({ error: error.code, message: error.message }, { status })
     }

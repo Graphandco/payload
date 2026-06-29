@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input'
 import { checkoutFormSchema, type CheckoutFormValues } from '@/lib/checkoutFormSchema'
 import { formatPrice } from '@/lib/formatPrice'
 import { canPlaceClickAndCollectOrder } from '@/lib/clickAndCollectStatus'
+import { isMollieConfigured } from '@/lib/mollie'
 import {
   formatPickupSlotValue,
   getAvailablePickupSlots,
@@ -129,15 +130,19 @@ function PickupSlotField({
 
 function SubmittedPreview({
   order,
+  hasOnlinePayment,
 }: {
   order: SubmittedOrder
+  hasOnlinePayment: boolean
 }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Commande {order.displayNumber}</CardTitle>
         <CardDescription>
-          Votre commande est enregistrée. Le paiement en ligne sera disponible prochainement.
+          {hasOnlinePayment
+            ? 'Votre commande est enregistrée. Le paiement en ligne n’a pas abouti ou a été interrompu.'
+            : 'Votre commande est enregistrée. Réglez votre commande sur place lors du retrait.'}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -201,6 +206,7 @@ export function CheckoutView({ site }: Props) {
 
   const pickupSlots = useMemo(() => getAvailablePickupSlots(site), [site])
   const canOrder = canPlaceClickAndCollectOrder(site)
+  const hasOnlinePayment = isMollieConfigured(site)
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
@@ -250,6 +256,7 @@ export function CheckoutView({ site }: Props) {
         trackingToken?: string
         total?: number
         pickupLabel?: string
+        checkoutUrl?: string
         message?: string
       }
 
@@ -264,6 +271,11 @@ export function CheckoutView({ site }: Props) {
 
       clearSite(siteId)
       toast.success(`Commande ${data.displayNumber} enregistrée`)
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl
+        return
+      }
 
       if (trackingToken) {
         router.push(`/commande/suivi/${trackingToken}`)
@@ -341,7 +353,7 @@ export function CheckoutView({ site }: Props) {
 
           <div className="mt-4">
             {submitted ? (
-              <SubmittedPreview order={submitted} />
+              <SubmittedPreview order={submitted} hasOnlinePayment={hasOnlinePayment} />
             ) : (
               <Card>
                 <CardContent className="pt-6">
@@ -427,12 +439,18 @@ export function CheckoutView({ site }: Props) {
                         className="w-full sm:w-auto"
                         disabled={!canOrder || isSubmitting}
                       >
-                        {isSubmitting ? 'Enregistrement…' : 'Confirmer la commande'}
+                        {isSubmitting
+                          ? 'Enregistrement…'
+                          : hasOnlinePayment
+                            ? 'Commander et payer'
+                            : 'Confirmer la commande'}
                       </Button>
 
-                      <p className="text-xs text-muted-foreground">
-                        Le paiement en ligne sera disponible prochainement.
-                      </p>
+                      {hasOnlinePayment ? (
+                        <p className="text-xs text-muted-foreground">
+                          Vous serez redirigé vers le paiement sécurisé Mollie après confirmation.
+                        </p>
+                      ) : null}
                     </form>
                   </Form>
                 </CardContent>
