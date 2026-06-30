@@ -25,7 +25,66 @@ DATABASE_URL=postgres://USER:PASSWORD@127.0.0.1:5433/payload_db
 PAYLOAD_SECRET=une-chaine-secrete-longue
 # Prod (URL publique de l'admin, ex. https://cms.mondomaine.fr)
 NEXT_PUBLIC_SERVER_URL=https://cms.mondomaine.fr
+
+# Brevo (e-mails transactionnels — un compte pour toute la plateforme)
+BREVO_API_KEY=xkeysib-...
+EMAIL_PLATFORM_FROM_ADDRESS=noreply@graphandco.com
+EMAIL_PLATFORM_FROM_NAME=Click & Collect Graph and Co
+# Optionnel : route de test POST /api/email/test (désactivée si absent)
+EMAIL_TEST_SECRET=dev-test-local
 ```
+
+## E-mails (Brevo)
+
+Les e-mails partent via l'**API Brevo** (`src/lib/email/`). Un seul compte Brevo pour tous les sites ; l'expéditeur affiché utilise le **nom du restaurant**, l'adresse technique vient du `.env` (`EMAIL_PLATFORM_FROM_ADDRESS`). Le **Reply-To** est l'e-mail contact du site (`sites.contact.email`).
+
+### Flux confirmation commande (étape 3)
+
+```text
+Paiement Mollie validé (webhook ou page suivi)
+    → syncOrderPaymentFromMollie
+    → paymentStatus = paid
+    → maybeSendOrderConfirmationEmail (si confirmationEmailSent = false)
+    → Brevo → client (order.customer.email)
+```
+
+Le HTML est **généré dans le code** (`buildOrderConfirmationContent.ts`), pas dans un template Brevo. Les `params` retournés par ce builder sont prêts pour une future migration vers un `templateId` Brevo par site.
+
+| Fichier | Rôle |
+|---------|------|
+| `brevoConfig.ts` | Variables `.env` (clé API, expéditeur plateforme) |
+| `resolveEmailSender.ts` | From (nom site + e-mail plateforme) et Reply-To |
+| `sendEmailViaBrevo.ts` | Appel API `v3/smtp/email` |
+| `buildOrderConfirmationContent.ts` | Sujet + HTML + texte + params |
+| `sendOrderConfirmationEmail.ts` | Envoi confirmation client |
+| `maybeSendOrderConfirmationEmail.ts` | Anti-doublon (`confirmationEmailSent`) |
+
+### Tester l'envoi Brevo (étape 2)
+
+```bash
+curl -X POST http://localhost:3000/api/email/test \
+  -H "Content-Type: application/json" \
+  -d '{
+    "siteId": 1,
+    "to": "vous@exemple.fr",
+    "secret": "dev-test-local"
+  }'
+```
+
+Requiert `EMAIL_TEST_SECRET` dans le `.env`. En prod : utiliser un secret fort ou retirer la variable pour désactiver la route.
+
+### Tester la confirmation commande (étape 3)
+
+1. Configurer `BREVO_API_KEY` et l'expéditeur plateforme dans `.env`
+2. Passer une commande avec Mollie (clé `test_…` sur le site)
+3. Payer → le webhook ou la page de suivi déclenche l'envoi
+4. Vérifier : mail client reçu, `confirmationEmailSent` coché sur la commande dans l'admin, log dans Brevo → Transactionnel
+
+### Prochaines étapes e-mail
+
+- **Étape 4** : notification restaurant (`site.contact.email`) à la commande payée
+- **Étape 5** : formulaire contact (remplacer le stub)
+- **Optionnel** : expéditeur `@domaine-restaurant` si le domaine est vérifié dans Brevo ; sinon fallback plateforme
 
 ## Développement local (recommandé)
 
@@ -296,7 +355,8 @@ src/
 │   ├── getSiteByTenant.ts      # Résolution du site depuis le hostname
 │   ├── getPageBySiteAndSlug.ts # Récupération page CMS
 │   ├── loadCustomHome.ts       # Registry des accueils custom
-│   └── loadCustomPage.ts       # Registry des pages custom (carte, etc.)
+│   ├── loadCustomPage.ts       # Registry des pages custom (carte, etc.)
+│   └── email/                  # Brevo : expéditeur, confirmation commande
 ├── migrations/                 # Migrations Postgres (prod)
 └── middleware.ts               # Routage par hostname
 ```
@@ -444,6 +504,7 @@ docker run --rm --env-file .env -e NODE_ENV=production --network web-network pay
 | `products` | Produits (scopés par site) |
 | `categories` | Catégories (scopées par site) |
 | `media` | Uploads (scopés par site) |
+| `orders` | Commandes click & collect (`confirmationEmailSent`, `molliePaymentId`, etc.) |
 
 ## Styles (front)
 

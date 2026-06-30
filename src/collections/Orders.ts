@@ -80,6 +80,16 @@ export const Orders: CollectionConfig = {
       },
     },
     {
+      name: 'confirmationEmailSent',
+      label: 'E-mail de confirmation envoyé',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        readOnly: true,
+        description: 'Passé à true après envoi Brevo de la confirmation client (paiement validé).',
+      },
+    },
+    {
       name: 'customer',
       label: 'Client',
       type: 'group',

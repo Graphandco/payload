@@ -651,6 +651,10 @@ export interface Order {
   status: 'in_progress' | 'completed' | 'cancelled';
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
   molliePaymentId?: string | null;
+  /**
+   * Passé à true après envoi Brevo de la confirmation client (paiement validé).
+   */
+  confirmationEmailSent?: boolean | null;
   customer: {
     name: string;
     email: string;
@@ -1129,6 +1133,7 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   paymentStatus?: T;
   molliePaymentId?: T;
+  confirmationEmailSent?: T;
   customer?:
     | T
     | {
