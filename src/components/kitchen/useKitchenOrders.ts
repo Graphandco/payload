@@ -1,3 +1,9 @@
+/**
+ * Données cuisine côté client : chargement, polling et mise à jour des statuts.
+ *
+ * Appelle /api/kitchen/orders avec credentials: include (cookie Payload).
+ * Sur 401/403, déclenche onSessionExpired → KitchenGate repasse en écran login.
+ */
 'use client'
 
 import { groupKitchenOrdersBySlot } from '@/lib/kitchen/groupKitchenOrdersBySlot'
@@ -7,7 +13,7 @@ import { toast } from 'sonner'
 
 const POLL_INTERVAL_MS = 20_000
 
-export function useKitchenOrders(siteId: number) {
+export function useKitchenOrders(siteId: number, onSessionExpired?: () => void) {
   const [groups, setGroups] = useState<KitchenOrderGroup[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -25,10 +31,16 @@ export function useKitchenOrders(siteId: number) {
       try {
         const response = await fetch(`/api/kitchen/orders?siteId=${siteId}`, {
           cache: 'no-store',
+          credentials: 'include',
         })
         const data = (await response.json()) as {
           orders?: KitchenOrder[]
           message?: string
+        }
+
+        if (response.status === 401 || response.status === 403) {
+          onSessionExpired?.()
+          return
         }
 
         if (!response.ok) {
@@ -45,7 +57,7 @@ export function useKitchenOrders(siteId: number) {
         setIsRefreshing(false)
       }
     },
-    [siteId],
+    [onSessionExpired, siteId],
   )
 
   useEffect(() => {
@@ -68,10 +80,16 @@ export function useKitchenOrders(siteId: number) {
         const response = await fetch(`/api/kitchen/orders/${orderId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ siteId, status }),
         })
 
         const data = (await response.json()) as { message?: string }
+
+        if (response.status === 401 || response.status === 403) {
+          onSessionExpired?.()
+          return
+        }
 
         if (!response.ok) {
           throw new Error(data.message ?? 'Mise à jour impossible.')
@@ -94,7 +112,7 @@ export function useKitchenOrders(siteId: number) {
         setUpdatingOrderId(null)
       }
     },
-    [siteId],
+    [onSessionExpired, siteId],
   )
 
   return {

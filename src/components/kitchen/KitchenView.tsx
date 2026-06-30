@@ -1,5 +1,8 @@
 /**
- * Écran cuisine : commandes en cours par créneau (tableaux shadcn).
+ * Écran cuisine connecté : commandes en cours groupées par créneau de retrait.
+ *
+ * Affiché par KitchenGate une fois la session validée.
+ * Données : useKitchenOrders → GET/PATCH /api/kitchen/orders (credentials: include).
  */
 'use client'
 
@@ -17,11 +20,13 @@ import { useState } from 'react'
 
 type Props = {
   site: Site
+  userEmail?: string | null
+  onSessionExpired: () => void
 }
 
-export function KitchenView({ site }: Props) {
+export function KitchenView({ site, userEmail, onSessionExpired }: Props) {
   const { groups, isLoading, isRefreshing, updatingOrderId, error, fetchOrders, updateStatus } =
-    useKitchenOrders(site.id)
+    useKitchenOrders(site.id, onSessionExpired)
 
   const [pendingAction, setPendingAction] = useState<KitchenPendingAction | null>(null)
 
@@ -39,12 +44,22 @@ export function KitchenView({ site }: Props) {
     setPendingAction(null)
   }
 
+  async function handleLogout() {
+    await fetch('/api/users/logout', {
+      method: 'POST',
+      credentials: 'include',
+    })
+    onSessionExpired()
+  }
+
   return (
     <div className="min-h-[60vh]">
       <KitchenHeader
         isLoading={isLoading}
         isRefreshing={isRefreshing}
+        userEmail={userEmail}
         onRefresh={() => void fetchOrders('refresh')}
+        onLogout={() => void handleLogout()}
       />
 
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">

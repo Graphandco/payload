@@ -1,7 +1,14 @@
 /**
- * Point d'entrée serveur de /cuisine : passe le site à KitchenView.
+ * Point d'entrée serveur de /cuisine (tous les sites sauf override custom).
+ *
+ * Routage :
+ *   [[...slug]]/page.tsx
+ *     → loadCustomPage(slug, "cuisine") en priorité (ex. graphandco)
+ *     → sinon KitchenPage ici
+ *
+ * KitchenPage délègue à KitchenGate (auth client + écran commandes).
  */
-import { KitchenView } from '@/components/kitchen/KitchenView'
+import { KitchenGate } from '@/components/kitchen/KitchenGate'
 import type { Site } from '@/payload-types'
 
 export const KITCHEN_PAGE_SLUG = 'cuisine'
@@ -11,7 +18,7 @@ type Props = {
 }
 
 export function KitchenPage({ site }: Props) {
-  return <KitchenView site={site} />
+  return <KitchenGate site={site} />
 }
 
 export function isKitchenPath(path: string): boolean {

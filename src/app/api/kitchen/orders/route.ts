@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   }
 
   const { siteId } = parsed.data
-  const access = await requireKitchenAccess(siteId)
+  const access = await requireKitchenAccess(request, siteId)
 
   if (!access.ok) {
     return Response.json({ error: 'FORBIDDEN', message: access.message }, { status: access.status })

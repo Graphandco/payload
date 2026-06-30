@@ -35,7 +35,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const { siteId, status } = parsed.data
-  const access = await requireKitchenAccess(siteId)
+  const access = await requireKitchenAccess(request, siteId)
 
   if (!access.ok) {
     return Response.json({ error: 'FORBIDDEN', message: access.message }, { status: access.status })

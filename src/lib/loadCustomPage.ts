@@ -13,6 +13,9 @@ const customPageLoaders: Record<string, Record<string, CustomPageLoader>> = {
   'lucelle-app': {
     carte: () => import('@/restaurants-custom/lucelle-app/carte/page'),
   },
+  graphandco: {
+    cuisine: () => import('@/restaurants-custom/graphandco/cuisine/page'),
+  },
 }
 
 export async function loadCustomPage(siteSlug: string, path: string): Promise<CustomSitePage | null> {
