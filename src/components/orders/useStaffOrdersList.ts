@@ -6,14 +6,18 @@
 import type { StaffOrdersListResult } from '@/lib/orders/staffOrderTypes'
 import { useCallback, useEffect, useState } from 'react'
 
-export function useStaffOrdersList(siteId: number, onSessionExpired?: () => void) {
+export function useStaffOrdersList(
+  siteId: number,
+  orderSearch: string,
+  onSessionExpired?: () => void,
+) {
   const [data, setData] = useState<StaffOrdersListResult | null>(null)
   const [page, setPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchOrders = useCallback(
-    async (targetPage: number) => {
+    async (targetPage: number, search: string) => {
       setIsLoading(true)
 
       try {
@@ -21,6 +25,11 @@ export function useStaffOrdersList(siteId: number, onSessionExpired?: () => void
           siteId: String(siteId),
           page: String(targetPage),
         })
+
+        const trimmedSearch = search.trim()
+        if (trimmedSearch) {
+          params.set('search', trimmedSearch)
+        }
 
         const response = await fetch(`/api/orders/staff?${params.toString()}`, {
           credentials: 'include',
@@ -52,8 +61,8 @@ export function useStaffOrdersList(siteId: number, onSessionExpired?: () => void
   )
 
   useEffect(() => {
-    void fetchOrders(1)
-  }, [fetchOrders])
+    void fetchOrders(1, orderSearch)
+  }, [fetchOrders, orderSearch])
 
   return {
     data,
@@ -61,6 +70,6 @@ export function useStaffOrdersList(siteId: number, onSessionExpired?: () => void
     isLoading,
     error,
     fetchOrders,
-    setPage: (nextPage: number) => void fetchOrders(nextPage),
+    setPage: (nextPage: number) => void fetchOrders(nextPage, orderSearch),
   }
 }

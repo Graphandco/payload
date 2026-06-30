@@ -10,7 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { StaffOrderListItem } from '@/lib/orders/staffOrderTypes'
-import { FileDown } from 'lucide-react'
+import { Check, FileDown, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 type Props = {
@@ -75,9 +75,11 @@ export function OrdersTable({ siteId, orders, onSessionExpired }: Props) {
       <TableHeader>
         <TableRow>
           <TableHead>Commande</TableHead>
+          <TableHead>Facture</TableHead>
           <TableHead>Client</TableHead>
           <TableHead>Date</TableHead>
           <TableHead className="text-right">Montant</TableHead>
+          <TableHead className="w-16 text-center">Payé</TableHead>
           <TableHead className="w-12 text-center">PDF</TableHead>
         </TableRow>
       </TableHeader>
@@ -85,9 +87,19 @@ export function OrdersTable({ siteId, orders, onSessionExpired }: Props) {
         {orders.map((order) => (
           <TableRow key={order.id}>
             <TableCell className="font-medium">{order.displayNumber}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {order.invoiceNumberLabel ?? '—'}
+            </TableCell>
             <TableCell>{order.customerName}</TableCell>
             <TableCell>{formatOrderDate(order.createdAt)}</TableCell>
             <TableCell className="text-right">{order.totalLabel}</TableCell>
+            <TableCell className="text-center">
+              {order.paymentStatus === 'paid' ? (
+                <Check className="mx-auto size-4 text-emerald-600" aria-label="Payé" />
+              ) : (
+                <X className="mx-auto size-4 text-red-600" aria-label="Non payé" />
+              )}
+            </TableCell>
             <TableCell className="text-center">
               <Button
                 type="button"

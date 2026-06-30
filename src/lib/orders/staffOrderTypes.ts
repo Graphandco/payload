@@ -1,6 +1,7 @@
 export type StaffOrderListItem = {
   id: number
   displayNumber: string
+  invoiceNumberLabel: string | null
   customerName: string
   createdAt: string
   total: number

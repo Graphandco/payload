@@ -8,6 +8,7 @@ import { OrdersTable } from '@/components/orders/OrdersTable'
 import { useStaffOrdersList } from '@/components/orders/useStaffOrdersList'
 import { Button } from '@/components/ui/button'
 import type { Site } from '@/payload-types'
+import { useState } from 'react'
 
 type Props = {
   site: Site
@@ -16,7 +17,12 @@ type Props = {
 }
 
 export function OrdersView({ site, userEmail, onSessionExpired }: Props) {
-  const { data, page, isLoading, error, setPage } = useStaffOrdersList(site.id, onSessionExpired)
+  const [orderSearch, setOrderSearch] = useState('')
+  const { data, page, isLoading, error, setPage } = useStaffOrdersList(
+    site.id,
+    orderSearch,
+    onSessionExpired,
+  )
 
   async function handleLogout() {
     await fetch('/api/users/logout', {
@@ -41,7 +47,12 @@ export function OrdersView({ site, userEmail, onSessionExpired }: Props) {
       </header>
 
       <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
-        <OrdersExportPanel site={site} onSessionExpired={onSessionExpired} />
+        <OrdersExportPanel
+          site={site}
+          orderSearch={orderSearch}
+          onOrderSearchChange={setOrderSearch}
+          onSessionExpired={onSessionExpired}
+        />
 
         {isLoading ? (
           <p className="text-sm text-muted-foreground">Chargement des commandes…</p>
@@ -51,7 +62,9 @@ export function OrdersView({ site, userEmail, onSessionExpired }: Props) {
           </p>
         ) : !data || data.orders.length === 0 ? (
           <p className="rounded-lg border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground">
-            Aucune commande pour le moment.
+            {orderSearch.trim()
+              ? 'Aucune commande ne correspond à cette recherche.'
+              : 'Aucune commande pour le moment.'}
           </p>
         ) : (
           <>

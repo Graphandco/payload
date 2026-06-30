@@ -6,6 +6,8 @@
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import type { Site } from '@/payload-types'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -16,10 +18,17 @@ import { toast } from 'sonner'
 
 type Props = {
   site: Site
+  orderSearch: string
+  onOrderSearchChange: (value: string) => void
   onSessionExpired?: () => void
 }
 
-export function OrdersExportPanel({ site, onSessionExpired }: Props) {
+export function OrdersExportPanel({
+  site,
+  orderSearch,
+  onOrderSearchChange,
+  onSessionExpired,
+}: Props) {
   const [range, setRange] = useState<DateRange | undefined>()
   const [isExporting, setIsExporting] = useState(false)
 
@@ -104,6 +113,17 @@ export function OrdersExportPanel({ site, onSessionExpired }: Props) {
               <Download />
               {isExporting ? 'Export en cours…' : 'Télécharger le ZIP'}
             </Button>
+            <div className="space-y-2">
+              <Label htmlFor="order-search">Filtrer par n° de commande ou de facture</Label>
+              <Input
+                id="order-search"
+                type="search"
+                value={orderSearch}
+                onChange={(event) => onOrderSearchChange(event.target.value)}
+                placeholder="Ex. #0042 ou F-0003"
+                autoComplete="off"
+              />
+            </div>
           </div>
         </div>
       </CardContent>

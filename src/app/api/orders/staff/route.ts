@@ -9,6 +9,7 @@ const querySchema = z.object({
   siteId: z.coerce.number().int().positive(),
   page: z.coerce.number().int().positive().optional().default(1),
   limit: z.coerce.number().int().positive().max(100).optional().default(getOrdersPageLimit()),
+  search: z.string().trim().optional(),
 })
 
 export async function GET(request: Request) {
@@ -17,6 +18,7 @@ export async function GET(request: Request) {
     siteId: url.searchParams.get('siteId'),
     page: url.searchParams.get('page') ?? undefined,
     limit: url.searchParams.get('limit') ?? undefined,
+    search: url.searchParams.get('search') ?? undefined,
   })
 
   if (!parsed.success) {
@@ -26,7 +28,7 @@ export async function GET(request: Request) {
     )
   }
 
-  const { siteId, page, limit } = parsed.data
+  const { siteId, page, limit, search } = parsed.data
   const access = await requireSiteStaffAccess(request, siteId)
 
   if (!access.ok) {
@@ -34,7 +36,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const result = await listStaffOrders(siteId, page, limit)
+    const result = await listStaffOrders(siteId, page, limit, search)
     return Response.json(result)
   } catch (error) {
     console.error('[GET /api/orders/staff]', error)

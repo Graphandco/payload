@@ -5,7 +5,9 @@ import configPromise from '@payload-config'
 import type { Order } from '@/payload-types'
 import { formatOrderNumber } from '@/lib/formatOrderNumber'
 import { formatPrice } from '@/lib/formatPrice'
+import { formatInvoiceNumber } from '@/lib/invoices/formatInvoiceNumber'
 import type { StaffOrdersListResult } from '@/lib/orders/staffOrderTypes'
+import { matchesOrderSearch } from '@/lib/orders/matchesOrderSearch'
 import { getPayload } from 'payload'
 
 const DEFAULT_ORDERS_PAGE_LIMIT = 50
@@ -31,6 +33,8 @@ function serializeStaffOrder(order: Order) {
   return {
     id: order.id,
     displayNumber: formatOrderNumber(order.orderNumber),
+    invoiceNumberLabel:
+      order.invoiceNumber != null ? formatInvoiceNumber(order.invoiceNumber) : null,
     customerName: order.customer.name,
     createdAt: order.createdAt,
     total,
@@ -44,8 +48,35 @@ export async function listStaffOrders(
   siteId: number,
   page: number,
   limit: number = getOrdersPageLimit(),
+  search?: string,
 ): Promise<StaffOrdersListResult> {
   const payload = await getPayload({ config: configPromise })
+  const query = search?.trim()
+
+  if (query) {
+    const result = await payload.find({
+      collection: 'orders',
+      where: {
+        site: { equals: siteId },
+      },
+      sort: '-createdAt',
+      limit: 1000,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    const filtered = result.docs.filter((order) => matchesOrderSearch(order, query))
+    const start = (page - 1) * limit
+    const pageOrders = filtered.slice(start, start + limit)
+
+    return {
+      orders: pageOrders.map(serializeStaffOrder),
+      page,
+      limit,
+      totalDocs: filtered.length,
+      totalPages: Math.max(1, Math.ceil(filtered.length / limit)),
+    }
+  }
 
   const result = await payload.find({
     collection: 'orders',
