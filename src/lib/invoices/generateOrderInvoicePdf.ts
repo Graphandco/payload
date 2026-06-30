@@ -1,5 +1,5 @@
 /**
- * Génère le buffer PDF d'une facture (attribue un n° si besoin).
+ * Génère le buffer PDF d'une facture (le n° est déjà attribué au paiement, sinon ici).
  */
 import { buildInvoicePdfBuffer, buildInvoicePdfFilename } from '@/lib/invoices/buildInvoicePdf'
 import { ensureInvoiceNumber } from '@/lib/invoices/ensureInvoiceNumber'

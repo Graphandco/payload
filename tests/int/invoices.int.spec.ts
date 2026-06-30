@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import type { Order } from '@/payload-types'
 import { formatInvoiceNumber } from '@/lib/invoices/formatInvoiceNumber'
+import { maybeEnsureInvoiceNumber } from '@/lib/invoices/maybeEnsureInvoiceNumber'
 import { getOrdersPageLimit } from '@/lib/orders/listStaffOrders'
 import { matchesOrderSearch } from '@/lib/orders/matchesOrderSearch'
 
@@ -7,6 +9,18 @@ describe('formatInvoiceNumber', () => {
   it('pads invoice numbers', () => {
     expect(formatInvoiceNumber(1)).toBe('F-0001')
     expect(formatInvoiceNumber(42)).toBe('F-0042')
+  })
+})
+
+describe('maybeEnsureInvoiceNumber', () => {
+  it('skips when the order is not paid', async () => {
+    const order = { id: 1, paymentStatus: 'pending' } as Order
+    await expect(maybeEnsureInvoiceNumber(order)).resolves.toBe(order)
+  })
+
+  it('skips when an invoice number already exists', async () => {
+    const order = { id: 1, paymentStatus: 'paid', invoiceNumber: 7 } as Order
+    await expect(maybeEnsureInvoiceNumber(order)).resolves.toBe(order)
   })
 })
 

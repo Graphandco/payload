@@ -1,10 +1,11 @@
 /**
  * Synchronise le statut de paiement d'une commande depuis l'API Mollie,
- * puis déclenche l'e-mail de confirmation si le paiement est validé.
+ * attribue un n° de facture si payée, puis envoie l'e-mail de confirmation.
  */
 import configPromise from '@payload-config'
 import type { Order, Site } from '@/payload-types'
 import { maybeSendOrderConfirmationEmail } from '@/lib/email/maybeSendOrderConfirmationEmail'
+import { maybeEnsureInvoiceNumber } from '@/lib/invoices/maybeEnsureInvoiceNumber'
 import { createMollieClientForSite, getMollieApiKey } from '@/lib/mollie'
 import { mapMolliePaymentStatusToOrderPaymentStatus } from '@/lib/molliePaymentStatus'
 import { getPayload } from 'payload'
@@ -30,5 +31,7 @@ export async function syncOrderPaymentFromMollie(site: Site, order: Order): Prom
     }
   }
 
-  return maybeSendOrderConfirmationEmail(currentOrder, site)
+  const orderWithInvoice = await maybeEnsureInvoiceNumber(currentOrder)
+
+  return maybeSendOrderConfirmationEmail(orderWithInvoice, site)
 }

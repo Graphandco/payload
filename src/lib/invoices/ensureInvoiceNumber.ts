@@ -1,5 +1,5 @@
 /**
- * Attribue un numéro de facture séquentiel par site à la première génération PDF.
+ * Attribue un numéro de facture séquentiel par site (paiement validé ou première génération PDF).
  */
 import configPromise from '@payload-config'
 import type { Order } from '@/payload-types'
