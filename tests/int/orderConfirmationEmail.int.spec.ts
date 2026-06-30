@@ -2,20 +2,25 @@ import { describe, expect, it } from 'vitest'
 import type { Order, Site } from '@/payload-types'
 import { buildOrderConfirmationContent } from '@/lib/email/buildOrderConfirmationContent'
 
-const site: Pick<Site, 'name' | 'slug' | 'domain'> = {
-  name: 'Mama Pizza',
-  slug: 'mama-pizza',
-  domain: 'mamapizza.fr',
+const site: Pick<Site, 'name' | 'slug' | 'domain' | 'contact'> = {
+  name: 'Graph and Co',
+  slug: 'graphandco',
+  domain: 'clickandcollect.graphandco.com',
+  contact: {
+    street: '12 rue de la Pizza',
+    postalCode: '67000',
+    city: 'Strasbourg',
+  },
 }
 
 const order = {
   id: 1,
-  orderNumber: 42,
+  orderNumber: 11,
   trackingToken: 'abc-123-def',
   total: 24.5,
   customer: {
-    name: 'Jean Dupont',
-    email: 'jean@exemple.fr',
+    name: 'Régis',
+    email: 'regis@exemple.fr',
     phone: '0600000000',
   },
   pickupSlot: {
@@ -33,33 +38,36 @@ const order = {
 } as Order
 
 describe('buildOrderConfirmationContent', () => {
-  it('builds subject, tracking link and line items', () => {
+  it('builds header, pickup address and line items', () => {
     const content = buildOrderConfirmationContent(order, site)
 
-    expect(content.subject).toBe('Mama Pizza — commande #0042 confirmée')
-    expect(content.params.displayNumber).toBe('#0042')
-    expect(content.params.customerName).toBe('Jean Dupont')
-    expect(content.params.total).toMatch(/24,50/)
-    expect(content.params.trackingUrl).toBe('https://mamapizza.fr/commande/suivi/abc-123-def')
-    expect(content.params.lines).toHaveLength(1)
-    expect(content.html).toContain('Jean Dupont')
+    expect(content.subject).toBe('Graph and Co — commande #0011 confirmée')
+    expect(content.params.displayNumber).toBe('#0011')
+    expect(content.params.customerName).toBe('Régis')
+    expect(content.params.pickupAddress).toBe('12 rue de la Pizza, 67000 Strasbourg')
+    expect(content.params.trackingUrl).toBe(
+      'https://clickandcollect.graphandco.com/commande/suivi/abc-123-def',
+    )
+    expect(content.html).toContain('Merci pour votre commande')
+    expect(content.html).toContain('Outfit')
+    expect(content.html).toContain('order-confirmation.png')
+    expect(content.html).toContain('width="150"')
+    expect(content.html).toContain('Bonjour Régis')
+    expect(content.html).toContain('#0011')
+    expect(content.html).toContain('12 rue de la Pizza, 67000 Strasbourg')
     expect(content.html).toContain('Margherita')
-    expect(content.html).toContain('https://clickandcollect.graphandco.com/email/order-confirmation.jpg')
-    expect(content.html).toContain('width="500"')
-    expect(content.text).toContain('Suivi : https://mamapizza.fr/commande/suivi/abc-123-def')
+    expect(content.html).not.toContain('Présentez-vous au restaurant')
+    expect(content.text).toContain('Vous pouvez la retirer')
+    expect(content.text).toContain('12 rue de la Pizza, 67000 Strasbourg')
   })
 
   it('exposes params for a future Brevo template migration', () => {
     const content = buildOrderConfirmationContent(order, site)
 
-    expect(content.params).toEqual({
-      siteName: 'Mama Pizza',
-      displayNumber: '#0042',
-      customerName: 'Jean Dupont',
-      pickupSlotLabel: content.params.pickupSlotLabel,
-      total: content.params.total,
-      trackingUrl: 'https://mamapizza.fr/commande/suivi/abc-123-def',
-      lines: [{ name: 'Margherita', quantity: 2, lineTotal: '24,00 €' }],
-    })
+    expect(content.params.siteName).toBe('Graph and Co')
+    expect(content.params.pickupTime).toBe('12:30')
+    expect(content.params.lines).toEqual([
+      { name: 'Margherita', quantity: 2, lineTotal: '24,00 €' },
+    ])
   })
 })

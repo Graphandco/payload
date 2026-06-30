@@ -10,15 +10,20 @@ import { formatPrice } from '@/lib/formatPrice'
 import { getOrderTrackingUrl } from '@/lib/getSitePublicUrl'
 import { formatPickupSlotLabel } from '@/lib/kitchen/formatPickupSlotLabel'
 
-/** Bannière fixe (fichier : public/email/order-confirmation.jpg). */
+/** Illustration fixe (fichier : public/email/order-confirmation.png). */
 const ORDER_CONFIRMATION_HEADER_IMAGE_URL =
-  'https://clickandcollect.graphandco.com/email/order-confirmation.jpg'
+  'https://clickandcollect.graphandco.com/email/order-confirmation.png'
+
+const EMAIL_FONT_FAMILY = "'Outfit', Arial, Helvetica, sans-serif"
 
 export type OrderConfirmationEmailParams = {
   siteName: string
   displayNumber: string
   customerName: string
   pickupSlotLabel: string
+  pickupDateLabel: string
+  pickupTime: string
+  pickupAddress: string | null
   total: string
   trackingUrl: string
   lines: {
@@ -43,12 +48,54 @@ function escapeHtml(value: string): string {
     .replaceAll('"', '&quot;')
 }
 
+/** Date de retrait en français (ex. « lundi 29 juin »). */
+function formatPickupDateLabel(date: string): string {
+  const normalizedDate = date.includes('T') ? date : `${date}T12:00:00.000Z`
+
+  return new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Europe/Paris',
+  }).format(new Date(normalizedDate))
+}
+
+/** Adresse du site sur une ligne (rue, code postal ville). */
+function formatPickupAddressInline(contact?: Site['contact'] | null): string | null {
+  if (!contact) {
+    return null
+  }
+
+  const street = contact.street?.trim()
+  const cityLine = [contact.postalCode?.trim(), contact.city?.trim()].filter(Boolean).join(' ')
+  const parts = [street, cityLine].filter((part) => part && part.length > 0)
+
+  return parts.length > 0 ? parts.join(', ') : null
+}
+
+function buildPickupSentence(
+  pickupDateLabel: string,
+  pickupTime: string,
+  pickupAddress: string | null,
+): string {
+  const datePart = `le ${pickupDateLabel} à ${pickupTime}`
+  if (pickupAddress) {
+    return `Vous pouvez la retirer ${datePart} à ${pickupAddress}.`
+  }
+
+  return `Vous pouvez la retirer ${datePart}.`
+}
+
 export function buildOrderConfirmationContent(
   order: Order,
-  site: Pick<Site, 'name' | 'slug' | 'domain'>,
+  site: Pick<Site, 'name' | 'slug' | 'domain' | 'contact'>,
 ): OrderConfirmationEmailContent {
   const displayNumber = formatOrderNumber(order.orderNumber)
   const pickupSlotLabel = formatPickupSlotLabel(order.pickupSlot.date, order.pickupSlot.time)
+  const pickupDateLabel = formatPickupDateLabel(order.pickupSlot.date)
+  const pickupTime = order.pickupSlot.time.trim()
+  const pickupAddress = formatPickupAddressInline(site.contact)
+  const pickupSentence = buildPickupSentence(pickupDateLabel, pickupTime, pickupAddress)
   const trackingUrl = getOrderTrackingUrl(site, order.trackingToken)
   const customerName = order.customer.name.trim()
 
@@ -63,6 +110,9 @@ export function buildOrderConfirmationContent(
     displayNumber,
     customerName,
     pickupSlotLabel,
+    pickupDateLabel,
+    pickupTime,
+    pickupAddress,
     total: formatPrice(order.total),
     trackingUrl,
     lines,
@@ -70,49 +120,84 @@ export function buildOrderConfirmationContent(
 
   const linesHtml = lines
     .map(
-      (line) =>
-        `<tr>
-          <td style="padding:8px 0;border-bottom:1px solid #eee;">${escapeHtml(line.name)} × ${line.quantity}</td>
-          <td style="padding:8px 0;border-bottom:1px solid #eee;text-align:right;">${escapeHtml(line.lineTotal)}</td>
+      (line) => `
+        <tr>
+          <td style="padding:14px 0;border-bottom:1px solid #ebebeb;font-family:${EMAIL_FONT_FAMILY};font-size:15px;color:#1a1a1a;">
+            ${escapeHtml(line.name)}&nbsp;&times;&nbsp;${line.quantity}
+          </td>
+          <td style="padding:14px 0;border-bottom:1px solid #ebebeb;font-family:${EMAIL_FONT_FAMILY};font-size:15px;font-weight:600;color:#1a1a1a;text-align:right;white-space:nowrap;">
+            ${escapeHtml(line.lineTotal)}
+          </td>
         </tr>`,
     )
     .join('')
 
-  const linesText = lines.map((line) => `- ${line.name} × ${line.quantity} : ${line.lineTotal}`).join('\n')
+  const linesText = lines
+    .map((line) => `- ${line.name} × ${line.quantity} : ${line.lineTotal}`)
+    .join('\n')
 
   const subject = `${site.name} — commande ${displayNumber} confirmée`
 
   const html = `
-    <div style="font-family:sans-serif;line-height:1.5;color:#111;max-width:560px;">
-      <img
-        src="${ORDER_CONFIRMATION_HEADER_IMAGE_URL}"
-        alt="${escapeHtml(site.name)}"
-        width="500"
-        style="display:block;width:500px;max-width:100%;height:auto;margin:0 0 20px;border:0;"
-      />
-      <p>Bonjour ${escapeHtml(customerName)},</p>
-      <p>Votre commande <strong>${escapeHtml(displayNumber)}</strong> chez <strong>${escapeHtml(site.name)}</strong> est confirmée et payée.</p>
-      <p><strong>Créneau de retrait :</strong> ${escapeHtml(pickupSlotLabel)}</p>
-      <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+    <div style="font-family:${EMAIL_FONT_FAMILY};line-height:1.5;color:#1a1a1a;max-width:560px;">
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin:0 0 28px;border-collapse:collapse;">
+        <tr>
+          <td style="width:150px;vertical-align:middle;padding-right:20px;">
+            <img
+              src="${ORDER_CONFIRMATION_HEADER_IMAGE_URL}"
+              alt=""
+              width="150"
+              style="display:block;width:150px;max-width:150px;height:auto;border:0;"
+            />
+          </td>
+          <td style="vertical-align:middle;">
+            <h1 style="font-family:${EMAIL_FONT_FAMILY};font-size:28px;font-weight:700;line-height:1.2;margin:0;color:#1a1a1a;">
+              Merci pour votre commande
+            </h1>
+          </td>
+        </tr>
+      </table>
+      <p style="font-family:${EMAIL_FONT_FAMILY};font-size:16px;margin:0 0 12px;">
+        Bonjour ${escapeHtml(customerName)},
+      </p>
+      <p style="font-family:${EMAIL_FONT_FAMILY};font-size:16px;margin:0 0 20px;">
+        Votre commande <strong>${escapeHtml(displayNumber)}</strong> chez <strong>${escapeHtml(site.name)}</strong> est confirmée et payée.
+      </p>
+      <p style="font-family:${EMAIL_FONT_FAMILY};font-size:16px;margin:0 0 28px;color:#333;">
+        ${escapeHtml(pickupSentence)}
+      </p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin:0 0 8px;">
         <tbody>
           ${linesHtml}
         </tbody>
       </table>
-      <p style="text-align:right;font-weight:bold;">Total : ${escapeHtml(params.total)}</p>
-      <p>
-        <a href="${escapeHtml(trackingUrl)}" style="display:inline-block;padding:12px 20px;background:#111;color:#fff;text-decoration:none;border-radius:6px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin:0 0 28px;">
+        <tr>
+          <td style="padding:16px 0 0;font-family:${EMAIL_FONT_FAMILY};font-size:16px;font-weight:700;color:#1a1a1a;">
+            Total
+          </td>
+          <td style="padding:16px 0 0;font-family:${EMAIL_FONT_FAMILY};font-size:18px;font-weight:700;color:#1a1a1a;text-align:right;">
+            ${escapeHtml(params.total)}
+          </td>
+        </tr>
+      </table>
+      <p style="margin:0;">
+        <a href="${escapeHtml(trackingUrl)}" style="display:inline-block;padding:14px 24px;background:#1a1a1a;color:#fff;font-family:${EMAIL_FONT_FAMILY};font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;">
           Suivre ma commande
         </a>
       </p>
-      <p style="font-size:13px;color:#666;">Présentez-vous au restaurant au créneau choisi.</p>
     </div>
   `.trim()
 
   const text = [
+    'Merci pour votre commande',
+    '',
     `Bonjour ${customerName},`,
     '',
     `Votre commande ${displayNumber} chez ${site.name} est confirmée et payée.`,
-    `Créneau de retrait : ${pickupSlotLabel}`,
+    '',
+    pickupSentence,
     '',
     'Articles :',
     linesText,
