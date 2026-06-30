@@ -27,6 +27,7 @@ export interface Config {
     categories: Category;
     products: Product;
     'order-sequences': OrderSequence;
+    'invoice-sequences': InvoiceSequence;
     orders: Order;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -42,6 +43,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'order-sequences': OrderSequencesSelect<false> | OrderSequencesSelect<true>;
+    'invoice-sequences': InvoiceSequencesSelect<false> | InvoiceSequencesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -97,6 +99,19 @@ export interface Site {
    * Domaine custom en production (ex. pizzeria-mamma.fr). Optionnel en dev : si vide, {slug}.localhost est utilisé.
    */
   domain?: string | null;
+  /**
+   * Informations affichées sur les factures PDF.
+   */
+  legal?: {
+    companyName?: string | null;
+    siret?: string | null;
+    vatNumber?: string | null;
+    rcs?: string | null;
+    /**
+     * Texte libre en bas de facture (capital social, etc.).
+     */
+    additionalMentions?: string | null;
+  };
   contact?: {
     email?: string | null;
     phone?: string | null;
@@ -641,6 +656,19 @@ export interface OrderSequence {
   createdAt: string;
 }
 /**
+ * Compteur interne par site pour les numéros de facture.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoice-sequences".
+ */
+export interface InvoiceSequence {
+  id: number;
+  site: number | Site;
+  nextNumber: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
@@ -655,6 +683,10 @@ export interface Order {
    * Passé à true après envoi Brevo de la confirmation client (paiement validé).
    */
   confirmationEmailSent?: boolean | null;
+  /**
+   * Attribué à la première génération du PDF facture.
+   */
+  invoiceNumber?: number | null;
   customer: {
     name: string;
     email: string;
@@ -730,6 +762,10 @@ export interface PayloadLockedDocument {
         value: number | OrderSequence;
       } | null)
     | ({
+        relationTo: 'invoice-sequences';
+        value: number | InvoiceSequence;
+      } | null)
+    | ({
         relationTo: 'orders';
         value: number | Order;
       } | null);
@@ -783,6 +819,15 @@ export interface SitesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   domain?: T;
+  legal?:
+    | T
+    | {
+        companyName?: T;
+        siret?: T;
+        vatNumber?: T;
+        rcs?: T;
+        additionalMentions?: T;
+      };
   contact?:
     | T
     | {
@@ -1125,6 +1170,16 @@ export interface OrderSequencesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invoice-sequences_select".
+ */
+export interface InvoiceSequencesSelect<T extends boolean = true> {
+  site?: T;
+  nextNumber?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
@@ -1134,6 +1189,7 @@ export interface OrdersSelect<T extends boolean = true> {
   paymentStatus?: T;
   molliePaymentId?: T;
   confirmationEmailSent?: T;
+  invoiceNumber?: T;
   customer?:
     | T
     | {

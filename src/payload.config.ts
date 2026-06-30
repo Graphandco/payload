@@ -12,6 +12,7 @@ import { Sites } from './collections/Sites'
 import { Pages } from './collections/Pages'
 import { Categories } from './collections/Categories'
 import { OrderSequences } from './collections/OrderSequences'
+import { InvoiceSequences } from './collections/InvoiceSequences'
 import { Orders } from './collections/Orders'
 import { Products } from './collections/Products'
 
@@ -45,7 +46,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Sites, Users, Pages, Media, Categories, Products, OrderSequences, Orders],
+  collections: [Sites, Users, Pages, Media, Categories, Products, OrderSequences, InvoiceSequences, Orders],
   i18n: {
     fallbackLanguage: 'fr',
     supportedLanguages: { fr },

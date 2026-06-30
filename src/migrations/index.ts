@@ -11,6 +11,8 @@ import * as migration_20260627_000000_click_and_collect_slot_settings from './20
 import * as migration_20260628_063500_schedule_service_periods from './20260628_063500_schedule_service_periods'
 import * as migration_20260628_120000_mollie_payment from './20260628_120000_mollie_payment'
 import * as migration_20260629_010000_order_confirmation_email_sent from './20260629_010000_order_confirmation_email_sent'
+import * as migration_20260630_120000_invoices_and_legal from './20260630_120000_invoices_and_legal'
+import * as migration_20260630_130000_invoice_sequences_locked_documents_rels from './20260630_130000_invoice_sequences_locked_documents_rels'
 
 export const migrations = [
   {
@@ -77,5 +79,15 @@ export const migrations = [
     up: migration_20260629_010000_order_confirmation_email_sent.up,
     down: migration_20260629_010000_order_confirmation_email_sent.down,
     name: '20260629_010000_order_confirmation_email_sent',
+  },
+  {
+    up: migration_20260630_120000_invoices_and_legal.up,
+    down: migration_20260630_120000_invoices_and_legal.down,
+    name: '20260630_120000_invoices_and_legal',
+  },
+  {
+    up: migration_20260630_130000_invoice_sequences_locked_documents_rels.up,
+    down: migration_20260630_130000_invoice_sequences_locked_documents_rels.down,
+    name: '20260630_130000_invoice_sequences_locked_documents_rels',
   },
 ]

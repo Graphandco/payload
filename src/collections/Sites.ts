@@ -116,6 +116,56 @@ export const Sites: CollectionConfig = {
                 },
               },
             },
+            {
+              name: 'legal',
+              label: 'Mentions légales',
+              type: 'group',
+              admin: {
+                description: 'Informations affichées sur les factures PDF.',
+              },
+              fields: [
+                {
+                  name: 'companyName',
+                  label: 'Raison sociale',
+                  type: 'text',
+                  admin: {
+                    placeholder: 'SARL Graph and Co',
+                  },
+                },
+                {
+                  name: 'siret',
+                  label: 'SIRET',
+                  type: 'text',
+                  admin: {
+                    placeholder: '123 456 789 00012',
+                  },
+                },
+                {
+                  name: 'vatNumber',
+                  label: 'N° TVA intracommunautaire',
+                  type: 'text',
+                  admin: {
+                    placeholder: 'FR12345678901',
+                  },
+                },
+                {
+                  name: 'rcs',
+                  label: 'RCS / RM',
+                  type: 'text',
+                  admin: {
+                    placeholder: 'RCS Strasbourg B 123 456 789',
+                  },
+                },
+                {
+                  name: 'additionalMentions',
+                  label: 'Mentions complémentaires',
+                  type: 'textarea',
+                  admin: {
+                    description: 'Texte libre en bas de facture (capital social, etc.).',
+                  },
+                },
+              ],
+            },
           ],
         },
         {

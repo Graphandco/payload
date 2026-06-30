@@ -90,6 +90,16 @@ export const Orders: CollectionConfig = {
       },
     },
     {
+      name: 'invoiceNumber',
+      label: 'N° facture',
+      type: 'number',
+      min: 1,
+      admin: {
+        readOnly: true,
+        description: 'Attribué à la première génération du PDF facture.',
+      },
+    },
+    {
       name: 'customer',
       label: 'Client',
       type: 'group',

@@ -8,6 +8,7 @@ import { CartPage, isCartPath } from '@/components/cart/CartPage'
 import { CheckoutPage, isCheckoutPath } from '@/components/checkout/CheckoutPage'
 import { ContactPage, isContactPath } from '@/components/contact/ContactPage'
 import { KitchenPage, isKitchenPath } from '@/components/kitchen/KitchenPage'
+import { OrdersPage, isOrdersPath } from '@/components/orders/OrdersPage'
 import { isMenuPath, MenuPage } from '@/components/menu/MenuPage'
 import {
   OrderTrackingPage,
@@ -93,6 +94,10 @@ export default async function TenantPage({ params }: Props) {
 
   if (isKitchenPath(path)) {
     return <KitchenPage site={site} />
+  }
+
+  if (isOrdersPath(path)) {
+    return <OrdersPage site={site} />
   }
 
   const page = await getPageBySiteAndSlug(site.id, path)
