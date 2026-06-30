@@ -45,6 +45,8 @@ describe('buildOrderConfirmationContent', () => {
     expect(content.params.displayNumber).toBe('#0011')
     expect(content.params.customerName).toBe('Régis')
     expect(content.params.pickupAddress).toBe('12 rue de la Pizza, 67000 Strasbourg')
+    expect(content.params.pickupStreet).toBe('12 rue de la Pizza')
+    expect(content.params.pickupCityLine).toBe('67000 Strasbourg')
     expect(content.params.trackingUrl).toBe(
       'https://clickandcollect.graphandco.com/commande/suivi/abc-123-def',
     )
@@ -54,11 +56,14 @@ describe('buildOrderConfirmationContent', () => {
     expect(content.html).toContain('width="150"')
     expect(content.html).toContain('Bonjour Régis')
     expect(content.html).toContain('#0011')
-    expect(content.html).toContain('12 rue de la Pizza, 67000 Strasbourg')
+    expect(content.html).toContain('Vous pouvez la retirer le')
+    expect(content.html).toContain('à:<br />12 rue de la Pizza<br />67000 Strasbourg')
     expect(content.html).toContain('Margherita')
     expect(content.html).not.toContain('Présentez-vous au restaurant')
-    expect(content.text).toContain('Vous pouvez la retirer')
-    expect(content.text).toContain('12 rue de la Pizza, 67000 Strasbourg')
+    expect(content.text).toContain('Vous pouvez la retirer le')
+    expect(content.text).toContain('Vous pouvez la retirer le lundi 29 juin à 12:30 à:')
+    expect(content.text).toContain('12 rue de la Pizza')
+    expect(content.text).toContain('67000 Strasbourg')
   })
 
   it('exposes params for a future Brevo template migration', () => {

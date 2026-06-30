@@ -24,6 +24,8 @@ export type OrderConfirmationEmailParams = {
   pickupDateLabel: string
   pickupTime: string
   pickupAddress: string | null
+  pickupStreet: string | null
+  pickupCityLine: string | null
   total: string
   trackingUrl: string
   lines: {
@@ -60,30 +62,68 @@ function formatPickupDateLabel(date: string): string {
   }).format(new Date(normalizedDate))
 }
 
-/** Adresse du site sur une ligne (rue, code postal ville). */
-function formatPickupAddressInline(contact?: Site['contact'] | null): string | null {
+function parsePickupAddress(contact?: Site['contact'] | null): {
+  street: string | null
+  cityLine: string | null
+  inline: string | null
+} {
   if (!contact) {
-    return null
+    return { street: null, cityLine: null, inline: null }
   }
 
-  const street = contact.street?.trim()
-  const cityLine = [contact.postalCode?.trim(), contact.city?.trim()].filter(Boolean).join(' ')
-  const parts = [street, cityLine].filter((part) => part && part.length > 0)
+  const street = contact.street?.trim() || null
+  const cityLine = [contact.postalCode?.trim(), contact.city?.trim()].filter(Boolean).join(' ') || null
+  const parts = [street, cityLine].filter((part): part is string => Boolean(part))
 
-  return parts.length > 0 ? parts.join(', ') : null
+  return {
+    street,
+    cityLine,
+    inline: parts.length > 0 ? parts.join(', ') : null,
+  }
 }
 
-function buildPickupSentence(
+function buildPickupText(
   pickupDateLabel: string,
   pickupTime: string,
-  pickupAddress: string | null,
+  street: string | null,
+  cityLine: string | null,
 ): string {
   const datePart = `le ${pickupDateLabel} à ${pickupTime}`
-  if (pickupAddress) {
-    return `Vous pouvez la retirer ${datePart} à ${pickupAddress}.`
+
+  if (street || cityLine) {
+    const lines = [`Vous pouvez la retirer ${datePart} à:`]
+    if (street) {
+      lines.push(street)
+    }
+    if (cityLine) {
+      lines.push(cityLine)
+    }
+    return lines.join('\n')
   }
 
   return `Vous pouvez la retirer ${datePart}.`
+}
+
+function buildPickupHtml(
+  pickupDateLabel: string,
+  pickupTime: string,
+  street: string | null,
+  cityLine: string | null,
+): string {
+  const datePart = `le ${pickupDateLabel} à ${pickupTime}`
+
+  if (street || cityLine) {
+    const lines = [`Vous pouvez la retirer ${escapeHtml(datePart)} à:`]
+    if (street) {
+      lines.push(escapeHtml(street))
+    }
+    if (cityLine) {
+      lines.push(escapeHtml(cityLine))
+    }
+    return lines.join('<br />')
+  }
+
+  return escapeHtml(`Vous pouvez la retirer ${datePart}.`)
 }
 
 export function buildOrderConfirmationContent(
@@ -94,8 +134,10 @@ export function buildOrderConfirmationContent(
   const pickupSlotLabel = formatPickupSlotLabel(order.pickupSlot.date, order.pickupSlot.time)
   const pickupDateLabel = formatPickupDateLabel(order.pickupSlot.date)
   const pickupTime = order.pickupSlot.time.trim()
-  const pickupAddress = formatPickupAddressInline(site.contact)
-  const pickupSentence = buildPickupSentence(pickupDateLabel, pickupTime, pickupAddress)
+  const { street: pickupStreet, cityLine: pickupCityLine, inline: pickupAddress } =
+    parsePickupAddress(site.contact)
+  const pickupText = buildPickupText(pickupDateLabel, pickupTime, pickupStreet, pickupCityLine)
+  const pickupHtml = buildPickupHtml(pickupDateLabel, pickupTime, pickupStreet, pickupCityLine)
   const trackingUrl = getOrderTrackingUrl(site, order.trackingToken)
   const customerName = order.customer.name.trim()
 
@@ -113,6 +155,8 @@ export function buildOrderConfirmationContent(
     pickupDateLabel,
     pickupTime,
     pickupAddress,
+    pickupStreet,
+    pickupCityLine,
     total: formatPrice(order.total),
     trackingUrl,
     lines,
@@ -139,7 +183,7 @@ export function buildOrderConfirmationContent(
   const subject = `${site.name} — commande ${displayNumber} confirmée`
 
   const html = `
-    <div style="font-family:${EMAIL_FONT_FAMILY};line-height:1.5;color:#1a1a1a;max-width:560px;">
+    <div style="font-family:${EMAIL_FONT_FAMILY}; margin-block:10px;line-height:1.5;color:#1a1a1a;max-width:560px;">
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;display=swap" rel="stylesheet" />
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin:0 0 28px;border-collapse:collapse;">
         <tr>
@@ -165,7 +209,10 @@ export function buildOrderConfirmationContent(
         Votre commande <strong>${escapeHtml(displayNumber)}</strong> chez <strong>${escapeHtml(site.name)}</strong> est confirmée et payée.
       </p>
       <p style="font-family:${EMAIL_FONT_FAMILY};font-size:16px;margin:0 0 28px;color:#333;">
-        ${escapeHtml(pickupSentence)}
+        ${pickupHtml}
+      </p>
+      <p style="font-family:${EMAIL_FONT_FAMILY};font-size:16px;margin:0 0 12px;color:#333;">
+        Voici les articles de votre commande :
       </p>
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin:0 0 8px;">
         <tbody>
@@ -197,7 +244,7 @@ export function buildOrderConfirmationContent(
     '',
     `Votre commande ${displayNumber} chez ${site.name} est confirmée et payée.`,
     '',
-    pickupSentence,
+    pickupText,
     '',
     'Articles :',
     linesText,
