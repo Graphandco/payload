@@ -16,10 +16,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { contactFormSchema, type ContactFormValues } from '@/lib/contactFormSchema'
-import { formatSiteAddress, hasSiteContactDetails } from '@/lib/formatSiteAddress'
 import type { Site } from '@/payload-types'
+import { SiteContactDetails } from '@/components/contact/SiteContactDetails'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Mail, MapPin, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -31,47 +30,6 @@ const defaultValues: ContactFormValues = {
   name: '',
   email: '',
   message: '',
-}
-
-function ContactDetails({ site }: { site: Site }) {
-  const { email, phone } = site.contact ?? {}
-  const formattedAddress = formatSiteAddress(site.contact)
-  const hasDetails = hasSiteContactDetails(site.contact)
-
-  if (!hasDetails) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Les coordonnées du restaurant seront bientôt disponibles ici.
-      </p>
-    )
-  }
-
-  return (
-    <ul className="space-y-4 text-sm">
-      {formattedAddress ? (
-        <li className="flex gap-3">
-          <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
-          <span className="whitespace-pre-line">{formattedAddress}</span>
-        </li>
-      ) : null}
-      {phone ? (
-        <li className="flex gap-3">
-          <Phone className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
-          <a href={`tel:${phone.replace(/\s/g, '')}`} className="hover:underline">
-            {phone}
-          </a>
-        </li>
-      ) : null}
-      {email ? (
-        <li className="flex gap-3">
-          <Mail className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
-          <a href={`mailto:${email}`} className="hover:underline">
-            {email}
-          </a>
-        </li>
-      ) : null}
-    </ul>
-  )
 }
 
 function SubmittedPreview({ values, onReset }: { values: ContactFormValues; onReset: () => void }) {
@@ -141,7 +99,7 @@ export function ContactView({ site }: Props) {
             Nos coordonnées
           </h2>
           <div className="mt-4">
-            <ContactDetails site={site} />
+            <SiteContactDetails site={site} />
           </div>
         </section>
 

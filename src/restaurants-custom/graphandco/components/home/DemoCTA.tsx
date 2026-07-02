@@ -22,7 +22,7 @@ export default function DemoCTA() {
             href="/panier"
             className={cn(
               buttonVariants({ variant: 'outline', size: 'lg' }),
-              'border-white/30 bg-transparent text-inherit no-underline hover:bg-white/10',
+              'graphandco-btn-outline no-underline',
             )}
           >
             Voir le panier

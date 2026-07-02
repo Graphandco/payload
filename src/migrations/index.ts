@@ -14,6 +14,7 @@ import * as migration_20260629_010000_order_confirmation_email_sent from './2026
 import * as migration_20260630_120000_invoices_and_legal from './20260630_120000_invoices_and_legal'
 import * as migration_20260630_130000_invoice_sequences_locked_documents_rels from './20260630_130000_invoice_sequences_locked_documents_rels'
 import * as migration_20260701_100000_legal_representative from './20260701_100000_legal_representative'
+import * as migration_20260702_100000_site_logo from './20260702_100000_site_logo'
 
 export const migrations = [
   {
@@ -95,5 +96,10 @@ export const migrations = [
     up: migration_20260701_100000_legal_representative.up,
     down: migration_20260701_100000_legal_representative.down,
     name: '20260701_100000_legal_representative',
+  },
+  {
+    up: migration_20260702_100000_site_logo.up,
+    down: migration_20260702_100000_site_logo.down,
+    name: '20260702_100000_site_logo',
   },
 ]

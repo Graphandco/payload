@@ -13,6 +13,7 @@ import { createPortal } from 'react-dom'
 
 type Props = {
   siteName: string
+  logoUrl?: string | null
   links: SiteNavLink[]
   actions?: React.ReactNode
   logoClassName?: string
@@ -26,6 +27,7 @@ const MD_BREAKPOINT = 768
 
 export function BurgerMenu({
   siteName,
+  logoUrl,
   links,
   actions,
   logoClassName = '',
@@ -252,10 +254,18 @@ export function BurgerMenu({
       <div className="flex items-center justify-between gap-4">
         <Link
           href="/"
-          className={`text-xl font-semibold tracking-tight no-underline ${logoClassName}`}
+          className={`inline-flex items-center gap-3 text-xl font-semibold tracking-tight no-underline ${logoClassName}`}
           onClick={close}
         >
-          {siteName}
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt=""
+              aria-hidden
+              className="h-8 w-auto max-w-30 shrink-0 object-contain"
+            />
+          ) : null}
+          <span>{siteName}</span>
         </Link>
 
         <div className="flex items-center gap-3 md:gap-6">

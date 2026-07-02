@@ -71,6 +71,26 @@ export const Sites: CollectionConfig = {
               required: true,
             },
             {
+              name: 'logo',
+              label: 'Logo',
+              type: 'upload',
+              relationTo: 'media',
+              admin: {
+                description: 'SVG, PNG ou JPG. Affiché dans l’en-tête à gauche du nom du site.',
+              },
+              filterOptions: ({ id }) => {
+                if (!id) {
+                  return true
+                }
+
+                return {
+                  site: {
+                    equals: id,
+                  },
+                }
+              },
+            },
+            {
               name: 'slug',
               label: 'Slug',
               type: 'text',

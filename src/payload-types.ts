@@ -92,6 +92,10 @@ export interface Site {
   id: number;
   name: string;
   /**
+   * SVG, PNG ou JPG. Affiché dans l’en-tête à gauche du nom du site.
+   */
+  logo?: (number | null) | Media;
+  /**
    * Identifiant technique du site. En dev, le domaine local sera {slug}.localhost.
    */
   slug: string;
@@ -478,6 +482,26 @@ export interface Site {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  site?: (number | null) | Site;
+  alt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
@@ -576,26 +600,6 @@ export interface Page {
   seoMetaDescription?: string | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  site?: (number | null) | Site;
-  alt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -821,6 +825,7 @@ export interface PayloadMigration {
  */
 export interface SitesSelect<T extends boolean = true> {
   name?: T;
+  logo?: T;
   slug?: T;
   domain?: T;
   legal?:

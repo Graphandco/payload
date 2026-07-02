@@ -17,7 +17,9 @@ export const Media: CollectionConfig = {
       type: 'text',
     },
   ],
-  upload: true,
+  upload: {
+    mimeTypes: ['image/jpeg', 'image/png', 'image/svg+xml'],
+  },
   hooks: {
     beforeChange: [createAssignDefaultSiteBeforeChange()],
   },

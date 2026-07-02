@@ -43,7 +43,7 @@ export async function getSiteByTenant(tenantKey: string): Promise<Site | null> {
       or: orConditions,
     },
     limit: 1,
-    depth: 0,
+    depth: 1,
     overrideAccess: true,
   })
 
