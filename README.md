@@ -57,7 +57,7 @@ Le HTML est **généré dans le code** (`buildOrderConfirmationContent.ts`), pas
 | `sendEmailViaBrevo.ts` | Appel API `v3/smtp/email` |
 | `buildOrderConfirmationContent.ts` | Sujet + HTML + texte + params |
 | `sendOrderConfirmationEmail.ts` | Envoi confirmation client |
-| `maybeSendOrderConfirmationEmail.ts` | Anti-doublon (`confirmationEmailSent`) |
+| `maybeSendOrderConfirmationEmail.ts` | Anti-doublon atomique (`confirmationEmailSent` réservé en base avant envoi Brevo) |
 
 ### Tester l'envoi Brevo (étape 2)
 
