@@ -13,6 +13,8 @@ export type SendEmailViaBrevoInput = {
   html: string
   text?: string
   site: Pick<Site, 'name' | 'contact'>
+  /** Défaut : true. Mettre à false pour les mails sans réponse attendue (ex. confirmation commande). */
+  includeReplyTo?: boolean
 }
 
 export class SendEmailError extends Error {
@@ -39,6 +41,7 @@ export async function sendEmailViaBrevo(input: SendEmailViaBrevoInput): Promise<
   }
 
   const { from, replyTo } = resolveEmailSender(input.site)
+  const shouldIncludeReplyTo = input.includeReplyTo !== false && Boolean(replyTo)
 
   const response = await fetch(BREVO_API_URL, {
     method: 'POST',
@@ -50,7 +53,7 @@ export async function sendEmailViaBrevo(input: SendEmailViaBrevoInput): Promise<
     body: JSON.stringify({
       sender: from,
       to: [{ email: input.to.trim() }],
-      ...(replyTo ? { replyTo: { email: replyTo } } : {}),
+      ...(shouldIncludeReplyTo && replyTo ? { replyTo: { email: replyTo } } : {}),
       subject: input.subject,
       htmlContent: input.html,
       ...(input.text ? { textContent: input.text } : {}),

@@ -22,5 +22,6 @@ export async function sendOrderConfirmationEmail(
     html,
     text,
     site,
+    includeReplyTo: false,
   })
 }

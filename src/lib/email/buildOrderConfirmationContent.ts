@@ -5,6 +5,7 @@
  * (`templateId` + variables) sans changer le déclencheur d'envoi.
  */
 import type { Order, Site } from '@/payload-types'
+import { formatFrenchPhoneNumber } from '@/lib/formatFrenchPhoneNumber'
 import { formatOrderNumber } from '@/lib/formatOrderNumber'
 import { formatPrice } from '@/lib/formatPrice'
 import { getOrderTrackingUrl } from '@/lib/getSitePublicUrl'
@@ -111,6 +112,20 @@ function buildPickupText(
   return `Vous pouvez la retirer ${datePart}.`
 }
 
+function buildNoReplyFooter(phone: string | null): { html: string; text: string } {
+  if (phone) {
+    return {
+      html: `Merci de ne pas répondre à cet e-mail — si besoin contactez le restaurant au ${escapeHtml(phone)}.`,
+      text: `Merci de ne pas répondre à cet e-mail — si besoin contactez le restaurant au ${phone}.`,
+    }
+  }
+
+  return {
+    html: 'Merci de ne pas répondre à cet e-mail.',
+    text: 'Merci de ne pas répondre à cet e-mail.',
+  }
+}
+
 function buildPickupHtml(
   pickupDateLabel: string,
   pickupTime: string,
@@ -147,6 +162,11 @@ export function buildOrderConfirmationContent(
   const pickupHtml = buildPickupHtml(pickupDateLabel, pickupTime, pickupStreet, pickupCityLine)
   const trackingUrl = getOrderTrackingUrl(site, order.trackingToken)
   const customerName = order.customer.name.trim()
+  const restaurantPhoneRaw = site.contact?.phone?.trim()
+  const restaurantPhone = restaurantPhoneRaw
+    ? formatFrenchPhoneNumber(restaurantPhoneRaw)
+    : null
+  const noReplyFooter = buildNoReplyFooter(restaurantPhone)
 
   const lines = (order.lines ?? []).map((line) => ({
     name: line.name,
@@ -241,6 +261,9 @@ export function buildOrderConfirmationContent(
           Suivre ma commande
         </a>
       </p>
+      <p style="font-family:${EMAIL_FONT_FAMILY};font-size:13px;margin:28px 0 0;color:#666;">
+        ${noReplyFooter.html}
+      </p>
     </div>
   `.trim()
 
@@ -259,6 +282,8 @@ export function buildOrderConfirmationContent(
     `Total : ${params.total}`,
     '',
     `Suivi : ${trackingUrl}`,
+    '',
+    noReplyFooter.text,
   ].join('\n')
 
   return { subject, html, text, params }

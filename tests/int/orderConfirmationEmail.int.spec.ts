@@ -10,6 +10,7 @@ const site: Pick<Site, 'name' | 'slug' | 'domain' | 'contact'> = {
     street: '12 rue de la Pizza',
     postalCode: '67000',
     city: 'Strasbourg',
+    phone: '0388123456',
   },
 }
 
@@ -64,6 +65,11 @@ describe('buildOrderConfirmationContent', () => {
     expect(content.text).toContain('Vous pouvez la retirer le lundi 29 juin à 12:30 à:')
     expect(content.text).toContain('12 rue de la Pizza')
     expect(content.text).toContain('67000 Strasbourg')
+    expect(content.html).toContain('Merci de ne pas répondre à cet e-mail')
+    expect(content.html).toContain('03 88 12 34 56')
+    expect(content.text).toContain(
+      'Merci de ne pas répondre à cet e-mail — si besoin contactez le restaurant au 03 88 12 34 56.',
+    )
   })
 
   it('exposes params for a future Brevo template migration', () => {
