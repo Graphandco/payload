@@ -74,6 +74,18 @@
   color: #c5e8df;
 }
 
+.site-graphandco .default-footer-link {
+  color: #c5e8df;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-graphandco .default-footer-link:hover {
+  color: #f4fdfa;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .site-graphandco .default-main a:not(.no-underline) {
   color: var(--graphandco-primary);
 }
@@ -135,11 +147,11 @@
 }
 
 /* Bandeau démo */
-.site-graphandco .graphandco-demo {
+/* .site-graphandco .graphandco-demo {
   background-color: var(--graphandco-primary);
   color: #f4fdfa;
 }
 
 .site-graphandco .graphandco-demo a {
   color: inherit;
-}
+} */

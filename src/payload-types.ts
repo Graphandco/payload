@@ -96,14 +96,18 @@ export interface Site {
    */
   slug: string;
   /**
-   * Domaine custom en production (ex. pizzeria-mamma.fr). Optionnel en dev : si vide, {slug}.localhost est utilisé.
+   * Exemple : youclickyoucollect.fr
    */
   domain?: string | null;
   /**
-   * Informations affichées sur les factures PDF.
+   * Informations pour les pages légales du site et le pied des factures PDF.
    */
   legal?: {
     companyName?: string | null;
+    /**
+     * Affiché dans les mentions légales (et directeur de la publication si non précisé ailleurs).
+     */
+    legalRepresentative?: string | null;
     siret?: string | null;
     vatNumber?: string | null;
     rcs?: string | null;
@@ -823,6 +827,7 @@ export interface SitesSelect<T extends boolean = true> {
     | T
     | {
         companyName?: T;
+        legalRepresentative?: T;
         siret?: T;
         vatNumber?: T;
         rcs?: T;

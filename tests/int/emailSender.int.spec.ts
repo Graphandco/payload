@@ -12,7 +12,7 @@ describe('resolveEmailSender', () => {
   const envBackup = { ...process.env }
 
   beforeEach(() => {
-    process.env.EMAIL_PLATFORM_FROM_ADDRESS = 'noreply@clickandcollect.graphandco.com'
+    process.env.EMAIL_PLATFORM_FROM_ADDRESS = 'noreply@youclickyoucollect.fr'
     process.env.EMAIL_PLATFORM_FROM_NAME = 'Graph and Co'
   })
 
@@ -26,7 +26,7 @@ describe('resolveEmailSender', () => {
 
     expect(sender.from).toEqual({
       name: 'Mama Pizza',
-      email: 'noreply@clickandcollect.graphandco.com',
+      email: 'noreply@youclickyoucollect.fr',
     })
     expect(sender.replyTo).toBe('contact@mamapizza.fr')
   })

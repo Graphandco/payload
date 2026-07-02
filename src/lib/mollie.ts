@@ -5,7 +5,7 @@ import createMollieClient from '@mollie/api-client'
 import type { Order, Site } from '@/payload-types'
 import { formatOrderNumber } from '@/lib/formatOrderNumber'
 
-const DEFAULT_PROD_APP_URL = 'https://clickandcollect.graphandco.com'
+const DEFAULT_PROD_APP_URL = 'https://youclickyoucollect.fr'
 
 export function getMollieWebhookUrl(): string | null {
   const explicit = process.env.MOLLIE_WEBHOOK_URL?.trim()

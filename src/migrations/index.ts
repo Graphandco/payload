@@ -13,6 +13,7 @@ import * as migration_20260628_120000_mollie_payment from './20260628_120000_mol
 import * as migration_20260629_010000_order_confirmation_email_sent from './20260629_010000_order_confirmation_email_sent'
 import * as migration_20260630_120000_invoices_and_legal from './20260630_120000_invoices_and_legal'
 import * as migration_20260630_130000_invoice_sequences_locked_documents_rels from './20260630_130000_invoice_sequences_locked_documents_rels'
+import * as migration_20260701_100000_legal_representative from './20260701_100000_legal_representative'
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20260630_130000_invoice_sequences_locked_documents_rels.up,
     down: migration_20260630_130000_invoice_sequences_locked_documents_rels.down,
     name: '20260630_130000_invoice_sequences_locked_documents_rels',
+  },
+  {
+    up: migration_20260701_100000_legal_representative.up,
+    down: migration_20260701_100000_legal_representative.down,
+    name: '20260701_100000_legal_representative',
   },
 ]

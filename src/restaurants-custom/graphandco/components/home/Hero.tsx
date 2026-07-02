@@ -16,7 +16,7 @@ export default function GraphandcoHero({ site }: Props) {
         <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-[3fr_2fr]">
           <div className="pb-8 sm:pb-12">
             <p className="mb-6 inline-block rounded-full border border-primary/20 bg-secondary/45 px-3 py-1 text-xs font-semibold tracking-wide text-primary uppercase">
-              Solution click &amp; collect
+              You click, you collect
             </p>
             <h1 className="text-4xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Votre click &amp; collect,

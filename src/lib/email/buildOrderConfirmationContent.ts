@@ -10,9 +10,16 @@ import { formatPrice } from '@/lib/formatPrice'
 import { getOrderTrackingUrl } from '@/lib/getSitePublicUrl'
 import { formatPickupSlotLabel } from '@/lib/kitchen/formatPickupSlotLabel'
 
+const DEFAULT_PROD_APP_URL = 'https://youclickyoucollect.fr'
+
 /** Illustration fixe (fichier : public/email/order-confirmation.png). */
-const ORDER_CONFIRMATION_HEADER_IMAGE_URL =
-  'https://clickandcollect.graphandco.com/email/order-confirmation.png'
+function getOrderConfirmationHeaderImageUrl(): string {
+  const base =
+    process.env.NEXT_PUBLIC_SERVER_URL?.trim() ||
+    (process.env.NODE_ENV === 'production' ? DEFAULT_PROD_APP_URL : 'http://localhost:3000')
+
+  return `${base.replace(/\/$/, '')}/email/order-confirmation.png`
+}
 
 const EMAIL_FONT_FAMILY = "'Outfit', Arial, Helvetica, sans-serif"
 
@@ -189,7 +196,7 @@ export function buildOrderConfirmationContent(
         <tr>
           <td style="width:150px;vertical-align:middle;padding-right:20px;">
             <img
-              src="${ORDER_CONFIRMATION_HEADER_IMAGE_URL}"
+              src="${escapeHtml(getOrderConfirmationHeaderImageUrl())}"
               alt=""
               width="150"
               style="display:block;width:150px;max-width:150px;height:auto;border:0;"

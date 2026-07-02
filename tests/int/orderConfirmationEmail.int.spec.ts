@@ -5,7 +5,7 @@ import { buildOrderConfirmationContent } from '@/lib/email/buildOrderConfirmatio
 const site: Pick<Site, 'name' | 'slug' | 'domain' | 'contact'> = {
   name: 'Graph and Co',
   slug: 'graphandco',
-  domain: 'clickandcollect.graphandco.com',
+  domain: 'youclickyoucollect.fr',
   contact: {
     street: '12 rue de la Pizza',
     postalCode: '67000',
@@ -48,7 +48,7 @@ describe('buildOrderConfirmationContent', () => {
     expect(content.params.pickupStreet).toBe('12 rue de la Pizza')
     expect(content.params.pickupCityLine).toBe('67000 Strasbourg')
     expect(content.params.trackingUrl).toBe(
-      'https://clickandcollect.graphandco.com/commande/suivi/abc-123-def',
+      'https://youclickyoucollect.fr/commande/suivi/abc-123-def',
     )
     expect(content.html).toContain('Merci pour votre commande')
     expect(content.html).toContain('Outfit')

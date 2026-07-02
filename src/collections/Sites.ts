@@ -89,8 +89,7 @@ export const Sites: CollectionConfig = {
               unique: true,
               access: adminOnlyFieldUpdate,
               admin: {
-                description:
-                  'Domaine custom en production (ex. pizzeria-mamma.fr). Optionnel en dev : si vide, {slug}.localhost est utilisé.',
+                description: 'Exemple : youclickyoucollect.fr',
               },
               hooks: {
                 beforeValidate: [
@@ -121,7 +120,8 @@ export const Sites: CollectionConfig = {
               label: 'Mentions légales',
               type: 'group',
               admin: {
-                description: 'Informations affichées sur les factures PDF.',
+                description:
+                  'Informations pour les pages légales du site et le pied des factures PDF.',
               },
               fields: [
                 {
@@ -130,6 +130,16 @@ export const Sites: CollectionConfig = {
                   type: 'text',
                   admin: {
                     placeholder: 'SARL Graph and Co',
+                  },
+                },
+                {
+                  name: 'legalRepresentative',
+                  label: 'Représentant légal',
+                  type: 'text',
+                  admin: {
+                    description:
+                      'Affiché dans les mentions légales (et directeur de la publication si non précisé ailleurs).',
+                    placeholder: 'M. Jean Dupont',
                   },
                 },
                 {
@@ -239,7 +249,8 @@ export const Sites: CollectionConfig = {
                       'Fermetures ou horaires spéciaux (Noël, congés…). Pas de jours fériés automatiques.',
                     initCollapsed: true,
                     components: {
-                      RowLabel: '@/components/admin/ScheduleExceptionRowLabel#ScheduleExceptionRowLabel',
+                      RowLabel:
+                        '@/components/admin/ScheduleExceptionRowLabel#ScheduleExceptionRowLabel',
                     },
                   },
                   fields: [

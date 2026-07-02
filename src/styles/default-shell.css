@@ -71,6 +71,18 @@
   color: #d6d3d1;
 }
 
+.site-default .default-footer-link {
+  color: #d6d3d1;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-default .default-footer-link:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .site-default .default-main a:not(.no-underline) {
   color: var(--italy-terracotta);
 }

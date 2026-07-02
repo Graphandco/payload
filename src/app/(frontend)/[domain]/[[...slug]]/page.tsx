@@ -7,6 +7,12 @@ import { CmsPageView } from '@/components/cms/CmsPageView'
 import { CartPage, isCartPath } from '@/components/cart/CartPage'
 import { CheckoutPage, isCheckoutPath } from '@/components/checkout/CheckoutPage'
 import { ContactPage, isContactPath } from '@/components/contact/ContactPage'
+import {
+  MentionsLegalesPage,
+  PrivacyPolicyPage,
+  isMentionsLegalesPath,
+  isPrivacyPolicyPath,
+} from '@/components/legal/LegalPages'
 import { KitchenPage, isKitchenPath } from '@/components/kitchen/KitchenPage'
 import { OrdersPage, isOrdersPath } from '@/components/orders/OrdersPage'
 import { isMenuPath, MenuPage } from '@/components/menu/MenuPage'
@@ -77,6 +83,14 @@ export default async function TenantPage({ params }: Props) {
 
   if (isContactPath(path)) {
     return <ContactPage site={site} />
+  }
+
+  if (isMentionsLegalesPath(path)) {
+    return <MentionsLegalesPage site={site} />
+  }
+
+  if (isPrivacyPolicyPath(path)) {
+    return <PrivacyPolicyPage site={site} />
   }
 
   if (isCheckoutPath(path)) {

@@ -1,17 +1,40 @@
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
-import type { LucideIcon } from 'lucide-react'
+import { CalendarClock, CreditCard, ShoppingBag, UtensilsCrossed, type LucideIcon } from 'lucide-react'
 
-export type GraphandcoFeature = {
+type Feature = {
   icon: LucideIcon
   title: string
   description: string
 }
 
-type Props = {
-  features: ReadonlyArray<GraphandcoFeature>
-}
+const features: readonly Feature[] = [
+  {
+    icon: UtensilsCrossed,
+    title: 'Carte en ligne',
+    description:
+      'Vos plats, catégories et prix synchronisés depuis un back-office simple. Chaque restaurant gère son propre catalogue.',
+  },
+  {
+    icon: ShoppingBag,
+    title: 'Panier & commande',
+    description:
+      'Vos clients composent leur commande en quelques clics, depuis leur téléphone ou leur ordinateur.',
+  },
+  {
+    icon: CalendarClock,
+    title: 'Créneaux de retrait',
+    description:
+      "Choix de la date et de l'heure de collecte — vous gardez le contrôle sur votre planning cuisine.",
+  },
+  {
+    icon: CreditCard,
+    title: 'Paiement en ligne',
+    description:
+      'Encaissement sécurisé avant le retrait. Moins de no-shows, moins de caisse le jour J.',
+  },
+]
 
-export default function GraphandcoFeatures({ features }: Props) {
+export default function GraphandcoFeatures() {
   return (
     <section className="px-4 py-16 sm:px-6 sm:py-20">
       <div className="mx-auto max-w-5xl">

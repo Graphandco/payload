@@ -49,10 +49,10 @@ describe('getSitePublicUrl', () => {
 describe('getMollieWebhookUrl', () => {
   it('uses MOLLIE_WEBHOOK_URL when set', async () => {
     const previous = process.env.MOLLIE_WEBHOOK_URL
-    process.env.MOLLIE_WEBHOOK_URL = 'https://clickandcollect.graphandco.com/api/mollie/webhook'
+    process.env.MOLLIE_WEBHOOK_URL = 'https://youclickyoucollect.fr/api/mollie/webhook'
 
     const { getMollieWebhookUrl } = await import('@/lib/mollie')
-    expect(getMollieWebhookUrl()).toBe('https://clickandcollect.graphandco.com/api/mollie/webhook')
+    expect(getMollieWebhookUrl()).toBe('https://youclickyoucollect.fr/api/mollie/webhook')
 
     if (previous === undefined) {
       delete process.env.MOLLIE_WEBHOOK_URL
@@ -65,10 +65,10 @@ describe('getMollieWebhookUrl', () => {
     const previousWebhook = process.env.MOLLIE_WEBHOOK_URL
     const previousServer = process.env.NEXT_PUBLIC_SERVER_URL
     delete process.env.MOLLIE_WEBHOOK_URL
-    process.env.NEXT_PUBLIC_SERVER_URL = 'https://clickandcollect.graphandco.com'
+    process.env.NEXT_PUBLIC_SERVER_URL = 'https://youclickyoucollect.fr'
 
     const { getMollieWebhookUrl } = await import('@/lib/mollie')
-    expect(getMollieWebhookUrl()).toBe('https://clickandcollect.graphandco.com/api/mollie/webhook')
+    expect(getMollieWebhookUrl()).toBe('https://youclickyoucollect.fr/api/mollie/webhook')
 
     if (previousWebhook === undefined) {
       delete process.env.MOLLIE_WEBHOOK_URL
