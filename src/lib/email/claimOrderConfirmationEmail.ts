@@ -1,7 +1,7 @@
 /**
  * Réserve atomiquement l'envoi du mail de confirmation (anti-doublon webhook / page suivi).
  */
-import { sql } from 'drizzle-orm'
+import { sql } from '@payloadcms/db-postgres'
 import type { BasePayload } from 'payload'
 
 function getClaimedRows(result: unknown): unknown[] {
