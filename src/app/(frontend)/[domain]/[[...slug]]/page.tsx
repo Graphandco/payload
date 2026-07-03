@@ -1,9 +1,8 @@
 /**
  * Routeur principal du front multi-tenant.
- * Résout chaque URL ({slug}.localhost/chemin) vers : accueil custom, page CMS,
- * page React custom, routes métier partagées (/carte, /panier, /cuisine) ou 404.
+ * Résout chaque URL ({slug}.localhost/chemin) vers : accueil custom, page React custom,
+ * routes métier partagées (/carte, /panier, /cuisine) ou 404.
  */
-import { CmsPageView } from '@/components/cms/CmsPageView'
 import { CartPage, isCartPath } from '@/components/cart/CartPage'
 import { CheckoutPage, isCheckoutPath } from '@/components/checkout/CheckoutPage'
 import { ContactPage, isContactPath } from '@/components/contact/ContactPage'
@@ -21,11 +20,10 @@ import {
   isOrderTrackingPath,
   parseOrderTrackingToken,
 } from '@/components/order-tracking/OrderTrackingPage'
-import { getPageBySiteAndSlug } from '@/lib/getPageBySiteAndSlug'
 import { getSiteByTenant } from '@/lib/getSiteByTenant'
 import { loadCustomHome } from '@/lib/loadCustomHome'
 import { loadCustomPage } from '@/lib/loadCustomPage'
-import { requireDefined, requireSite } from '@/lib/requireSite'
+import { abortNotFound, requireDefined, requireSite } from '@/lib/requireSite'
 import { resolveDomainPageMetadata } from '@/lib/seo/domainPageSeo'
 import { resolveTenantPathFromSlug } from '@/lib/seo/tenantPageSeo'
 
@@ -53,11 +51,6 @@ export default async function TenantPage({ params }: PageProps<'/[domain]/[[...s
     const CustomHome = await loadCustomHome(site.slug)
     if (CustomHome) {
       return <CustomHome site={site} />
-    }
-
-    const homePage = await getPageBySiteAndSlug(site.id, 'accueil')
-    if (homePage) {
-      return <CmsPageView page={homePage} site={site} />
     }
 
     return (
@@ -110,6 +103,5 @@ export default async function TenantPage({ params }: PageProps<'/[domain]/[[...s
     return <OrdersPage site={site} />
   }
 
-  const page = requireDefined(await getPageBySiteAndSlug(site.id, path))
-  return <CmsPageView page={page} site={site} />
+  abortNotFound()
 }

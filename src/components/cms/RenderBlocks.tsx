@@ -1,11 +1,12 @@
 /**
  * Mappe les blocs Payload (texte, image, galerie…) vers des composants React front.
  */
-import type { Media, Page } from '@/payload-types'
+import type { CmsPageBlock } from '@/types/cmsPage'
+import type { Media } from '@/payload-types'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import Image from 'next/image'
 
-type PageBlock = Page['layout'][number]
+type PageBlock = CmsPageBlock
 
 function resolveMedia(media: number | Media): Media | null {
   return typeof media === 'object' && media !== null ? media : null

@@ -16,3 +16,7 @@ export function requireDefined<T>(value: T | null | undefined): T {
 
   return value
 }
+
+export function abortNotFound(): never {
+  notFound()
+}

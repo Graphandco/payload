@@ -2,10 +2,11 @@
  * Rendu d'une page CMS Payload : titre + blocs de contenu (RenderBlocks).
  */
 import { RenderBlocks } from '@/components/cms/RenderBlocks'
-import type { Page, Site } from '@/payload-types'
+import type { CmsPage } from '@/types/cmsPage'
+import type { Site } from '@/payload-types'
 
 type Props = {
-  page: Page
+  page: CmsPage
   site: Site
 }
 
