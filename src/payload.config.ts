@@ -9,7 +9,7 @@ import { fr } from '@payloadcms/translations/languages/fr'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Sites } from './collections/Sites'
-import { Pages } from './collections/Pages'
+// import { Pages } from './collections/Pages'
 import { Categories } from './collections/Categories'
 import { OrderSequences } from './collections/OrderSequences'
 import { InvoiceSequences } from './collections/InvoiceSequences'
@@ -46,7 +46,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Sites, Users, Pages, Media, Categories, Products, OrderSequences, InvoiceSequences, Orders],
+  collections: [Sites, Users, Media, Categories, Products, OrderSequences, InvoiceSequences, Orders],
   i18n: {
     fallbackLanguage: 'fr',
     supportedLanguages: { fr },

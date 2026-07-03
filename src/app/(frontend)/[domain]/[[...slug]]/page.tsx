@@ -25,28 +25,28 @@ import { getPageBySiteAndSlug } from '@/lib/getPageBySiteAndSlug'
 import { getSiteByTenant } from '@/lib/getSiteByTenant'
 import { loadCustomHome } from '@/lib/loadCustomHome'
 import { loadCustomPage } from '@/lib/loadCustomPage'
-import { notFound } from 'next/navigation'
-
-type Props = {
-  params: Promise<{ domain: string; slug?: string[] }>
-}
+import { requireDefined, requireSite } from '@/lib/requireSite'
+import { resolveDomainPageMetadata } from '@/lib/seo/domainPageSeo'
+import { resolveTenantPathFromSlug } from '@/lib/seo/tenantPageSeo'
 
 function resolvePagePath(slug?: string[]): string {
-  return slug?.join('/') ?? ''
+  return resolveTenantPathFromSlug(slug)
+}
+
+export async function generateMetadata({
+  params,
+}: Pick<PageProps<'/[domain]/[[...slug]]'>, 'params'>) {
+  const { domain: tenantKey, slug } = await params
+  return resolveDomainPageMetadata(tenantKey, slug)
 }
 
 function isHomePath(path: string): boolean {
   return path === '' || path === 'accueil'
 }
 
-export default async function TenantPage({ params }: Props) {
+export default async function TenantPage({ params }: PageProps<'/[domain]/[[...slug]]'>) {
   const { domain: tenantKey, slug } = await params
-  const site = await getSiteByTenant(tenantKey)
-
-  if (!site) {
-    notFound()
-  }
-
+  const site = requireSite(await getSiteByTenant(tenantKey))
   const path = resolvePagePath(slug)
 
   if (isHomePath(path)) {
@@ -98,11 +98,7 @@ export default async function TenantPage({ params }: Props) {
   }
 
   if (isOrderTrackingPath(path)) {
-    const token = parseOrderTrackingToken(path)
-    if (!token) {
-      notFound()
-    }
-
+    const token = requireDefined(parseOrderTrackingToken(path))
     return <OrderTrackingPage site={site} token={token} />
   }
 
@@ -114,10 +110,6 @@ export default async function TenantPage({ params }: Props) {
     return <OrdersPage site={site} />
   }
 
-  const page = await getPageBySiteAndSlug(site.id, path)
-  if (!page) {
-    notFound()
-  }
-
+  const page = requireDefined(await getPageBySiteAndSlug(site.id, path))
   return <CmsPageView page={page} site={site} />
 }

@@ -22,7 +22,6 @@ export interface Config {
   collections: {
     sites: Site;
     users: User;
-    pages: Page;
     media: Media;
     categories: Category;
     products: Product;
@@ -38,7 +37,6 @@ export interface Config {
   collectionsSelect: {
     sites: SitesSelect<false> | SitesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
@@ -532,77 +530,6 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
- */
-export interface Page {
-  id: number;
-  site?: (number | null) | Site;
-  title: string;
-  slug: string;
-  layout: (
-    | {
-        text: string;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'simpleText';
-      }
-    | {
-        paragraph: string;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'simpleParagraph';
-      }
-    | {
-        content: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'formattedText';
-      }
-    | {
-        image: number | Media;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'image';
-      }
-    | {
-        items: {
-          fieldType: 'text' | 'textarea';
-          textValue?: string | null;
-          textareaValue?: string | null;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'conditionalRepeater';
-      }
-    | {
-        images: (number | Media)[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'gallery';
-      }
-  )[];
-  seoMetaTitle?: string | null;
-  seoMetaDescription?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
@@ -748,10 +675,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
-      } | null)
-    | ({
-        relationTo: 'pages';
-        value: number | Page;
       } | null)
     | ({
         relationTo: 'media';
@@ -1055,72 +978,6 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
- */
-export interface PagesSelect<T extends boolean = true> {
-  site?: T;
-  title?: T;
-  slug?: T;
-  layout?:
-    | T
-    | {
-        simpleText?:
-          | T
-          | {
-              text?: T;
-              id?: T;
-              blockName?: T;
-            };
-        simpleParagraph?:
-          | T
-          | {
-              paragraph?: T;
-              id?: T;
-              blockName?: T;
-            };
-        formattedText?:
-          | T
-          | {
-              content?: T;
-              id?: T;
-              blockName?: T;
-            };
-        image?:
-          | T
-          | {
-              image?: T;
-              id?: T;
-              blockName?: T;
-            };
-        conditionalRepeater?:
-          | T
-          | {
-              items?:
-                | T
-                | {
-                    fieldType?: T;
-                    textValue?: T;
-                    textareaValue?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        gallery?:
-          | T
-          | {
-              images?: T;
-              id?: T;
-              blockName?: T;
-            };
-      };
-  seoMetaTitle?: T;
-  seoMetaDescription?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
