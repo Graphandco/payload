@@ -15,6 +15,8 @@ export type SendEmailViaBrevoInput = {
   site: Pick<Site, 'name' | 'contact'>
   /** Défaut : true. Mettre à false pour les mails sans réponse attendue (ex. confirmation commande). */
   includeReplyTo?: boolean
+  /** Remplace le Reply-To issu de resolveEmailSender (ex. email du visiteur sur le formulaire contact). */
+  replyTo?: string | { email: string; name?: string }
 }
 
 export class SendEmailError extends Error {
@@ -40,8 +42,14 @@ export async function sendEmailViaBrevo(input: SendEmailViaBrevoInput): Promise<
     throw error
   }
 
-  const { from, replyTo } = resolveEmailSender(input.site)
-  const shouldIncludeReplyTo = input.includeReplyTo !== false && Boolean(replyTo)
+  const { from, replyTo: defaultReplyTo } = resolveEmailSender(input.site)
+  const replyToOverride = input.replyTo
+  const replyToEmail =
+    typeof replyToOverride === 'string'
+      ? replyToOverride.trim()
+      : replyToOverride?.email?.trim() || defaultReplyTo
+  const replyToName = typeof replyToOverride === 'object' ? replyToOverride?.name?.trim() : undefined
+  const shouldIncludeReplyTo = input.includeReplyTo !== false && Boolean(replyToEmail)
 
   const response = await fetch(BREVO_API_URL, {
     method: 'POST',
@@ -53,7 +61,14 @@ export async function sendEmailViaBrevo(input: SendEmailViaBrevoInput): Promise<
     body: JSON.stringify({
       sender: from,
       to: [{ email: input.to.trim() }],
-      ...(shouldIncludeReplyTo && replyTo ? { replyTo: { email: replyTo } } : {}),
+      ...(shouldIncludeReplyTo && replyToEmail
+        ? {
+            replyTo: {
+              email: replyToEmail,
+              ...(replyToName ? { name: replyToName } : {}),
+            },
+          }
+        : {}),
       subject: input.subject,
       htmlContent: input.html,
       ...(input.text ? { textContent: input.text } : {}),

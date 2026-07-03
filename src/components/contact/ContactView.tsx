@@ -1,5 +1,5 @@
 /**
- * Affichage client de /contact : coordonnées du site et formulaire (aperçu, Resend plus tard).
+ * Affichage client de /contact : coordonnées du site et formulaire (envoi via Brevo).
  */
 'use client'
 
@@ -32,56 +32,58 @@ const defaultValues: ContactFormValues = {
   message: '',
 }
 
-function SubmittedPreview({ values, onReset }: { values: ContactFormValues; onReset: () => void }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Message envoyé (aperçu)</CardTitle>
-        <CardDescription>
-          L&apos;envoi par email sera branché plus tard. Voici ce qui a été saisi :
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <dl className="space-y-3 text-sm">
-          <div>
-            <dt className="font-medium text-muted-foreground">Nom</dt>
-            <dd className="mt-1">{values.name}</dd>
-          </div>
-          <div>
-            <dt className="font-medium text-muted-foreground">Email</dt>
-            <dd className="mt-1">
-              <a href={`mailto:${values.email}`} className="hover:underline">
-                {values.email}
-              </a>
-            </dd>
-          </div>
-          <div>
-            <dt className="font-medium text-muted-foreground">Message</dt>
-            <dd className="mt-1 whitespace-pre-wrap">{values.message}</dd>
-          </div>
-        </dl>
-        <Button type="button" variant="outline" onClick={onReset}>
-          Envoyer un autre message
-        </Button>
-      </CardContent>
-    </Card>
-  )
-}
+type SubmitState = 'idle' | 'loading' | 'success' | 'error'
 
 export function ContactView({ site }: Props) {
-  const [submitted, setSubmitted] = useState<ContactFormValues | null>(null)
+  const [submitState, setSubmitState] = useState<SubmitState>('idle')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues,
   })
 
-  const handleSubmit = (values: ContactFormValues) => {
-    setSubmitted(values)
+  const handleSubmit = async (values: ContactFormValues) => {
+    setSubmitState('loading')
+    setErrorMessage(null)
+
+    const website =
+      document.querySelector<HTMLInputElement>('input[name="contact-website"]')?.value ?? ''
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...values,
+          website,
+        }),
+      })
+
+      const data = (await response.json().catch(() => null)) as {
+        message?: string
+        error?: string
+      } | null
+
+      if (!response.ok) {
+        setSubmitState('error')
+        setErrorMessage(data?.message ?? 'Impossible d\'envoyer le message. Réessayez plus tard.')
+        return
+      }
+
+      setSubmitState('success')
+      form.reset(defaultValues)
+    } catch {
+      setSubmitState('error')
+      setErrorMessage('Impossible d\'envoyer le message. Vérifiez votre connexion et réessayez.')
+    }
   }
 
   const handleReset = () => {
-    setSubmitted(null)
+    setSubmitState('idle')
+    setErrorMessage(null)
     form.reset(defaultValues)
   }
 
@@ -109,13 +111,34 @@ export function ContactView({ site }: Props) {
           </h2>
 
           <div className="mt-4">
-            {submitted ? (
-              <SubmittedPreview values={submitted} onReset={handleReset} />
+            {submitState === 'success' ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Message envoyé</CardTitle>
+                  <CardDescription>
+                    Merci, votre message a bien été transmis. Nous vous répondrons dès que possible.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button type="button" variant="outline" onClick={handleReset}>
+                    Envoyer un autre message
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
               <Card>
                 <CardContent className="pt-6">
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                      <input
+                        type="text"
+                        name="contact-website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        className="hidden"
+                        aria-hidden
+                      />
+
                       <FormField
                         control={form.control}
                         name="name"
@@ -127,6 +150,7 @@ export function ContactView({ site }: Props) {
                                 className="py-6"
                                 autoComplete="name"
                                 placeholder="Votre nom"
+                                disabled={submitState === 'loading'}
                                 {...field}
                               />
                             </FormControl>
@@ -147,6 +171,7 @@ export function ContactView({ site }: Props) {
                                 type="email"
                                 autoComplete="email"
                                 placeholder="vous@exemple.fr"
+                                disabled={submitState === 'loading'}
                                 {...field}
                               />
                             </FormControl>
@@ -166,6 +191,7 @@ export function ContactView({ site }: Props) {
                                 rows={6}
                                 placeholder="Votre message…"
                                 className="min-h-32"
+                                disabled={submitState === 'loading'}
                                 {...field}
                               />
                             </FormControl>
@@ -174,8 +200,18 @@ export function ContactView({ site }: Props) {
                         )}
                       />
 
-                      <Button type="submit" className="w-full sm:w-auto">
-                        Envoyer
+                      {submitState === 'error' && errorMessage ? (
+                        <p className="text-sm text-destructive" role="alert">
+                          {errorMessage}
+                        </p>
+                      ) : null}
+
+                      <Button
+                        type="submit"
+                        className="w-full sm:w-auto"
+                        disabled={submitState === 'loading'}
+                      >
+                        {submitState === 'loading' ? 'Envoi en cours…' : 'Envoyer'}
                       </Button>
                     </form>
                   </Form>
