@@ -41,7 +41,7 @@ export function MenuProductRow({ siteId, product }: Props) {
           className="size-14 shrink-0 rounded object-cover"
         />
       ) : null}
-      <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-1  gap-3 items-center justify-between">
         <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <span className="font-medium text-lg leading-tight">{product.name}</span>

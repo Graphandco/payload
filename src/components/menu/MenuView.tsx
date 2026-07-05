@@ -89,14 +89,14 @@ export function MenuView({ site, sections }: Props) {
             'sticky top-16 z-10 shrink-0',
             isDesktop
               ? 'w-36 self-start sm:w-40 lg:w-48'
-              : '-mx-4 flex w-auto max-w-[100vw] overflow-x-auto border-b border-border bg-background/95 px-4 backdrop-blur-sm **:data-[slot=tabs-trigger]:shrink-0',
+              : '-mx-4 flex w-auto max-w-[100vw] overflow-x-auto border-b border-border bg-background/95 px-4 backdrop-blur-sm **:data-[slot=tabs-trigger]:shrink-0 h-32 scrollbar-hide',
           )}
         >
           {sections.map((section) => (
             <TabsTrigger
               key={getSectionId(section)}
               value={getSectionId(section)}
-              className="leading-loose text-primary"
+              className={cn('leading-loose text-primary', isDesktop ? '' : 'pb-5')}
             >
               {section.category?.name ?? 'Autres'}
             </TabsTrigger>
