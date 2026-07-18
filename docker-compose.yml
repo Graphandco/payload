@@ -1,6 +1,6 @@
 services:
   payload:
-    container_name: payload
+    container_name: youclickyoucollect
     build:
       context: .
       dockerfile: Dockerfile
