@@ -1,9 +1,0 @@
-# Copier vers docker-compose.override.yml pour le dev local
-# cp docker-compose.override.example.yml docker-compose.override.yml
-services:
-  payload:
-    ports:
-      - "3000:3000"
-    environment:
-      # 127.0.0.1 dans .env = machine hôte ; dans Docker, utiliser le conteneur Postgres du réseau web-network
-      DATABASE_URL: postgres://USER:PASSWORD@postgres-main:5432/payload_db

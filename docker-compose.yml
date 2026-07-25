@@ -1,14 +1,21 @@
 services:
   payload:
+    platform: linux/amd64
+    image: dockerhub.graphandco.com/youclickyoucollect:latest
     container_name: youclickyoucollect
     build:
       context: .
       dockerfile: Dockerfile
+      tags:
+        - dockerhub.graphandco.com/youclickyoucollect:1.0.0
+        - dockerhub.graphandco.com/youclickyoucollect:latest
+      args:
+        NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL}
+    pull_policy: always
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      NODE_ENV: production
       HOSTNAME: 0.0.0.0
       PORT: 3000
     networks:

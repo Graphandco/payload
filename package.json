@@ -21,7 +21,11 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "dev:docker": "concurrently -k \"PORT=3000 node --watch server.js\" \"npx wait-on -t 10000 http://localhost:3000 && npx browser-sync start -c bs-config.docker.js\"",
+    "docker:build": "docker compose -f docker-compose.yml build",
+    "docker:push": "docker compose -f docker-compose.yml push",
+    "docker:deploy": "docker compose -f docker-compose.yml build && docker compose -f docker-compose.yml push"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
