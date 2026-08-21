@@ -69,7 +69,7 @@ export function ContactView({ site }: Props) {
 
       if (!response.ok) {
         setSubmitState('error')
-        setErrorMessage(data?.message ?? 'Impossible d\'envoyer le message. Réessayez plus tard.')
+        setErrorMessage(data?.message ?? "Impossible d'envoyer le message. Réessayez plus tard.")
         return
       }
 
@@ -77,7 +77,7 @@ export function ContactView({ site }: Props) {
       form.reset(defaultValues)
     } catch {
       setSubmitState('error')
-      setErrorMessage('Impossible d\'envoyer le message. Vérifiez votre connexion et réessayez.')
+      setErrorMessage("Impossible d'envoyer le message. Vérifiez votre connexion et réessayez.")
     }
   }
 
@@ -92,7 +92,7 @@ export function ContactView({ site }: Props) {
       <p className="text-sm text-neutral-600">{site.name}</p>
       <h1 className="text-4xl font-semibold tracking-tight">Contact</h1>
       <p className="mt-2 max-w-2xl text-neutral-600">
-        Une question, une réservation ou un renseignement ? Écrivez-nous.
+        Vous avez des questions, des suggestions ou des demandes de service ? Écrivez-nous.
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:gap-12">

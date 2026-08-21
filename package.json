@@ -1,7 +1,7 @@
 {
-  "name": "payload",
+  "name": "You click, you collect",
   "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
+  "description": "Service de click and collect pour les restaurateurs",
   "license": "MIT",
   "type": "module",
   "scripts": {
